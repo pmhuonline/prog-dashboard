@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-07-31T20:38:35+00:00",
+  "updated": "2026-07-31T21:10:37+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -17,7 +17,7 @@
       ],
       "breakdowns": [
         {
-          "label": "Tech Status",
+          "label": "Tech Issues",
           "items": [
             {
               "name": "Yes",
@@ -40,7 +40,21 @@
           "value": 6968
         }
       ],
-      "breakdowns": []
+      "breakdowns": [
+        {
+          "label": "Tech Issues",
+          "items": [
+            {
+              "name": "Yes",
+              "value": 44
+            },
+            {
+              "name": "No",
+              "value": 517
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "MFTF Metrics",
