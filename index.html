@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Program Metrics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500&family=Karla:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:  #E6E1E8;
+    --ink:    #191320;
+    --muted:  #6B6272;
+    --plum:   #4C1F45;
+    --brass:  #A9752B;
+    --sage:   #4E6B63;
+    --rule:   rgba(25, 19, 32, 0.16);
+    --rule-strong: rgba(25, 19, 32, 0.45);
+
+    --display: "Fraunces", Georgia, serif;
+    --body:    "Karla", system-ui, sans-serif;
+    --data:    "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: clamp(1.5rem, 5vw, 4.5rem) clamp(1.25rem, 5vw, 3rem) 4rem;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .sheet { max-width: 62rem; margin: 0 auto; }
+
+  /* ---- masthead ---- */
+
+  .masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .eyebrow {
+    font-family: var(--data);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .title {
+    font-family: var(--display);
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-size: clamp(2.75rem, 9vw, 5rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin: 0.75rem 0 0;
+  }
+
+  /* ---- one section per Asana board ---- */
+
+  .board {
+    border-top: 1px solid var(--rule-strong);
+    padding-top: 1.5rem;
+    margin-top: 3.5rem;
+  }
+
+  .board-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .board-name {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .board-note {
+    font-family: var(--data);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+  }
+
+  /* ---- big numbers ---- */
+
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  }
+
+  .figure {
+    padding: 0.25rem 1.5rem 0.25rem 1.5rem;
+    border-left: 1px solid var(--rule);
+  }
+  .figure:first-child { border-left: 0; padding-left: 0; }
+
+  .figure-label {
+    font-family: var(--data);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .figure-value {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(2.25rem, 6vw, 3.4rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .figure-value.is-empty { color: var(--muted); font-weight: 300; }
+
+  /* ---- bars resting on a staff line ---- */
+
+  .group { margin-top: 2.75rem; }
+
+  .group-label {
+    font-family: var(--data);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--plum);
+    margin: 0 0 1.25rem;
+  }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: minmax(5rem, 9rem) 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+
+  .bar-name { font-size: 0.95rem; overflow-wrap: anywhere; }
+
+  .bar-track {
+    position: relative;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .bar-fill {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 0.7rem;
+    width: 0;
+    border-radius: 1px;
+    transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .bar-value {
+    font-family: var(--data);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    min-width: 3.5ch;
+    text-align: right;
+  }
+
+  /* ---- states ---- */
+
+  .notice {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 34rem;
+    margin-top: 3rem;
+  }
+  .notice code {
+    font-family: var(--data);
+    font-size: 0.85em;
+    background: rgba(25, 19, 32, 0.07);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+  }
+
+  footer {
+    font-family: var(--data);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-top: 1px solid var(--rule);
+    margin-top: 4rem;
+    padding-top: 1.25rem;
+  }
+
+  @media (max-width: 34rem) {
+    .figure {
+      border-left: 0;
+      padding-left: 0;
+      padding-right: 0;
+      border-top: 1px solid var(--rule);
+      padding-top: 1.1rem;
+      margin-top: 1.1rem;
+    }
+    .figure:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+    .bar-row { grid-template-columns: 1fr auto; }
+    .bar-track { grid-column: 1 / -1; order: 3; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bar-fill { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="masthead">
+    <p class="eyebrow">Impact dashboard</p>
+    <p class="eyebrow" id="updated"></p>
+  </header>
+  <h1 class="title" id="title">Program Metrics</h1>
+
+  <main id="boards"></main>
+
+  <footer>Figures drawn from Asana</footer>
+</div>
+
+<script>
+  var BAR_COLORS = ["var(--plum)", "var(--brass)", "var(--sage)"];
+  var animationOrder = 0;
+
+  function formatNumber(value) {
+    return Number(value).toLocaleString("en-US");
+  }
+
+  function formatDate(isoString) {
+    var when = new Date(isoString);
+    if (isNaN(when)) return "";
+    return "Updated " + when.toLocaleString("en-US", {
+      day: "numeric", month: "short", year: "numeric",
+      hour: "numeric", minute: "2-digit"
+    });
+  }
+
+  function makeFigures(figures) {
+    var grid = document.createElement("div");
+    grid.className = "figures";
+
+    figures.forEach(function (figure) {
+      var block = document.createElement("div");
+      block.className = "figure";
+
+      var label = document.createElement("span");
+      label.className = "figure-label";
+      label.textContent = figure.label;
+
+      var value = document.createElement("div");
+      value.className = "figure-value";
+      if (figure.value === null || figure.value === undefined) {
+        value.classList.add("is-empty");
+        value.textContent = "\u2014";  // em dash
+      } else {
+        value.textContent = formatNumber(figure.value);
+      }
+
+      block.appendChild(label);
+      block.appendChild(value);
+      grid.appendChild(block);
+    });
+
+    return grid;
+  }
+
+  function makeBreakdown(group, colorIndex) {
+    var section = document.createElement("section");
+    section.className = "group";
+
+    var heading = document.createElement("h3");
+    heading.className = "group-label";
+    heading.textContent = group.label;
+    section.appendChild(heading);
+
+    var counts = group.items.map(function (item) { return item.value; });
+    var largest = Math.max.apply(null, counts.concat([1]));
+
+    group.items.forEach(function (item) {
+      var row = document.createElement("div");
+      row.className = "bar-row";
+
+      var name = document.createElement("div");
+      name.className = "bar-name";
+      name.textContent = item.name;
+
+      var track = document.createElement("div");
+      track.className = "bar-track";
+
+      var fill = document.createElement("div");
+      fill.className = "bar-fill";
+      fill.style.background = BAR_COLORS[colorIndex % BAR_COLORS.length];
+      track.appendChild(fill);
+
+      var value = document.createElement("div");
+      value.className = "bar-value";
+      value.textContent = formatNumber(item.value);
+
+      row.appendChild(name);
+      row.appendChild(track);
+      row.appendChild(value);
+      section.appendChild(row);
+
+      // Let the bars arrive one after another, like notes.
+      var width = (item.value / largest) * 100;
+      var delay = 150 + (animationOrder * 70);
+      animationOrder += 1;
+      setTimeout(function () { fill.style.width = width + "%"; }, delay);
+    });
+
+    return section;
+  }
+
+  function drawBoards(sections) {
+    var host = document.getElementById("boards");
+    host.innerHTML = "";
+    animationOrder = 0;
+
+    sections.forEach(function (section, index) {
+      var board = document.createElement("section");
+      board.className = "board";
+
+      var head = document.createElement("div");
+      head.className = "board-head";
+
+      var name = document.createElement("h2");
+      name.className = "board-name";
+      name.textContent = section.name;
+      head.appendChild(name);
+
+      if (section.note) {
+        var note = document.createElement("span");
+        note.className = "board-note";
+        note.textContent = section.note;
+        head.appendChild(note);
+      }
+
+      board.appendChild(head);
+      board.appendChild(makeFigures(section.figures || []));
+
+      (section.breakdowns || []).forEach(function (group) {
+        board.appendChild(makeBreakdown(group, index));
+      });
+
+      host.appendChild(board);
+    });
+  }
+
+  // The ?t= on the end stops browsers serving a stale copy.
+  fetch("data.json?t=" + Date.now())
+    .then(function (response) {
+      if (!response.ok) throw new Error("missing");
+      return response.json();
+    })
+    .then(function (data) {
+      var title = data.title || "Dashboard";
+      document.getElementById("title").textContent = title;
+      document.title = title;
+      document.getElementById("updated").textContent = formatDate(data.updated);
+      drawBoards(data.sections || []);
+    })
+    .catch(function () {
+      document.getElementById("updated").textContent = "";
+      document.getElementById("boards").innerHTML =
+        '<p class="notice">No figures yet. Run the ' +
+        "<code>Refresh dashboard data</code> action from the Actions tab " +
+        "of this repository, then reload this page.</p>";
+    });
+</script>
+</body>
+</html>
