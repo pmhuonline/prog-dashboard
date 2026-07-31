@@ -141,8 +141,16 @@ body {
 <div class="dfn">Source: live Asana project data · Refreshed hourly by an automated job · Figures reflect tasks present in each board at the time of the last refresh.</div>
 
 <script>
-// Bars cycle through the PMHU palette, one colour per chart.
+// Bars cycle through the PMHU palette, one colour per chart, unless
+// the config names a colour for a specific value.
 var BAR_COLORS = ["var(--accent)", "var(--live)", "var(--dev)"];
+var PALETTE = {
+  accent: "var(--accent)",
+  live:   "var(--live)",
+  dev:    "var(--dev)",
+  muted:  "var(--muted)",
+  soft:   "var(--soft)"
+};
 
 function formatNumber(value) {
   return Number(value).toLocaleString("en-US");
@@ -212,7 +220,9 @@ function makeBarGroup(group, colorIndex, delayCounter) {
 
     var fill = document.createElement("div");
     fill.className = "bar-fill";
-    fill.style.background = BAR_COLORS[colorIndex % BAR_COLORS.length];
+    fill.style.background = item.color
+      ? (PALETTE[item.color] || item.color)
+      : BAR_COLORS[colorIndex % BAR_COLORS.length];
     track.appendChild(fill);
 
     var value = document.createElement("div");
