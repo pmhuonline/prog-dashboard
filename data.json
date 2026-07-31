@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-07-31T23:04:55+00:00",
+  "updated": "2026-07-31T23:40:47+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -95,7 +95,7 @@
     },
     {
       "name": "MFTF Metrics",
-      "note": "Not connected yet",
+      "note": "No connection",
       "figures": [
         {
           "label": "Students",
