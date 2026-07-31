@@ -56,6 +56,18 @@ DASHBOARD_TITLE = "Program Metrics"
 # built-in tags. Tasks can hold several tags at once, so each one counts
 # toward every tag it carries.
 #
+# Tidying up messy values - works on figures and breakdowns alike:
+#
+#   "ignore"    values to leave out entirely, e.g. ["Other", "TBD"]
+#   "merge"     rewrite one value as another. Use it to shorten an awkward
+#               tag for display, or to fold an old name into its current
+#               one: {"Old Name": "Current Name"}
+#               Give a list to split one value into several:
+#                 {"A / B": ["A", "B"]}
+#               Rewriting happens before counting, so two values pointing
+#               at the same name collapse into one. Nothing in Asana
+#               changes either way.
+#
 # Both figures and breakdowns accept these optional filters:
 #
 #   "where"     only tasks whose field matches, e.g. {"Status": "New"}
@@ -65,8 +77,8 @@ DASHBOARD_TITLE = "Program Metrics"
 #               Dates must be written YYYY-MM-DD. Tasks with that date
 #               field left blank are excluded.
 #
-# Note: "order", "rename" and "colors" all key off the value as Asana
-# spells it, so renaming a bar never breaks its ordering or colour.
+# Note: "order", "rename" and "colors" key off the value as it stands
+# after any merging.
 #
 SECTIONS = [
     {
@@ -75,7 +87,17 @@ SECTIONS = [
         "figures": [
             {"label": "Performances", "sum": "Number of Sessions"},
             {"label": "Individuals Reached", "sum": "Number in Audience"},
-            {"label": "Facilities Served", "unique": "Tags", "list": True},
+            {
+                "label": "Facilities Served",
+                "unique": "Tags",
+                "list": True,
+                # Not a facility - left out of the count entirely.
+                "ignore": ["Other"],
+                # Counted as one facility, shown by the short name.
+                "merge": {
+                    "Salastina / Huntington / UCLA": "Salastina",
+                },
+            },
         ],
         "breakdowns": [
             {
@@ -233,6 +255,37 @@ def values_for(task, field_name):
     return []
 
 
+def tidied_values(task, field_name, spec, seen_keys):
+    """Read a field, then apply the spec's ignore and merge settings."""
+    ignore = set(spec.get("ignore") or [])
+    merge = spec.get("merge") or {}
+
+    out = []
+    for value in values_for(task, field_name):
+        if value in ignore:
+            seen_keys.add(value)
+            continue
+        if value in merge:
+            seen_keys.add(value)
+            replacement = merge[value]
+            if isinstance(replacement, list):
+                out.extend(replacement)
+            else:
+                out.append(replacement)
+        else:
+            out.append(value)
+    return out
+
+
+def warn_about_unused(spec, seen_keys, label):
+    """Flag merge or ignore entries that never matched anything."""
+    configured = set(spec.get("ignore") or []) | set(spec.get("merge") or {})
+    stale = sorted(configured - seen_keys)
+    for entry in stale:
+        print(f"  ! {label}: nothing in Asana matches '{entry}' - "
+              "check the spelling, or drop it if the tag is gone")
+
+
 def field_value(task, field_name):
     """The single value of a field, or None. Used for filtering."""
     found = values_for(task, field_name)
@@ -330,14 +383,17 @@ def build_section(section, tasks, available):
         figure = {"label": spec["label"]}
 
         if "unique" in spec:
-            seen = set()
+            seen_keys = set()
+            found = set()
             for task in rows:
-                seen.update(values_for(task, spec["unique"]))
-            figure["value"] = len(seen)
+                found.update(tidied_values(task, spec["unique"], spec,
+                                           seen_keys))
+            warn_about_unused(spec, seen_keys, spec["label"])
+            figure["value"] = len(found)
             if spec.get("list"):
                 # Sorted so the popup reads alphabetically, and so the
                 # file doesn't churn between runs.
-                figure["items"] = sorted(seen, key=lambda s: s.lower())
+                figure["items"] = sorted(found, key=lambda s: s.lower())
         elif "sum" in spec:
             figure["value"] = tidy_number(
                 sum(field_number(t, spec["sum"]) for t in rows)
@@ -351,13 +407,15 @@ def build_section(section, tasks, available):
     if available:
         for spec in section.get("breakdowns", []):
             rows = eligible_tasks(tasks, spec)
+            seen_keys = set()
             tally = Counter()
             for task in rows:
-                found = values_for(task, spec["group_by"])
+                found = tidied_values(task, spec["group_by"], spec, seen_keys)
                 if not found:
                     tally["Not set"] += 1
                 for value in found:
                     tally[value] += 1
+            warn_about_unused(spec, seen_keys, spec["label"])
 
             if spec.get("order"):
                 # Show exactly these categories, in this order, zeros included.
@@ -371,8 +429,8 @@ def build_section(section, tasks, available):
                     for name, count in tally.most_common()
                 ]
 
-            # Colour and relabel using the value as Asana spells it, so
-            # these settings never have to be kept in step with each other.
+            # Colour and relabel using the value as it stands after merging,
+            # so these settings don't have to be kept in step with each other.
             rename = spec.get("rename") or {}
             colors = spec.get("colors") or {}
             for item in items:
@@ -408,9 +466,9 @@ def main():
         for project_id, tasks in cache.items():
             cache[project_id] = [t for t in tasks if not t.get("completed")]
 
-    # Print what each board offers. When a number comes back as zero,
-    # this is where you check your spelling.
-    print("\nWhat's available on your tasks:")
+    # Print what each board offers, before any merging. When a number
+    # looks wrong, this is the raw truth to compare against.
+    print("\nWhat's available on your tasks (raw, before merging):")
     for project_id, tasks in cache.items():
         names = sorted({
             field["name"]
@@ -431,10 +489,10 @@ def main():
         if not names:
             print("      (none found)")
         print(f"    tags ({len(tag_names)} distinct):")
-        for name in tag_names[:40]:
+        for name in tag_names[:60]:
             print(f"      - {name}")
-        if len(tag_names) > 40:
-            print(f"      ... and {len(tag_names) - 40} more")
+        if len(tag_names) > 60:
+            print(f"      ... and {len(tag_names) - 60} more")
         if not tag_names:
             print("      (none found)")
     print()
