@@ -49,7 +49,7 @@ SECTIONS = [
         ],
         "breakdowns": [
             {
-                "label": "Tech Status",
+                "label": "Tech Issues",
                 "group_by": "Tech Status",
                 "order": ["Yes", "No"],
             },
@@ -61,7 +61,13 @@ SECTIONS = [
         "figures": [
             {"label": "Lessons", "sum": "Number of Sessions"},
         ],
-        "breakdowns": [],
+        "breakdowns": [
+            {
+                "label": "Tech Issues",
+                "group_by": "Tech Status",
+                "order": ["Yes", "No"],
+            },
+        ],
     },
     {
         "name": "MFTF Metrics",
