@@ -40,6 +40,9 @@ DASHBOARD_TITLE = "Program Metrics"
 #                           Asana is never asked about it.
 #                 (none)    just count the tasks
 #
+#               Add "list": True to a "unique" figure and the card becomes
+#               clickable, opening a popup listing the values it counted.
+#
 #   "breakdowns"  the bar charts - group tasks by a field, count each value
 #                 "order"   optional, forces the categories into this order
 #                           and shows them even when the count is zero
@@ -48,6 +51,10 @@ DASHBOARD_TITLE = "Program Metrics"
 #                 "colors"  optional, sets each bar's colour. Use the house
 #                           palette names: "accent" (coral), "live" (teal),
 #                           "dev" (grey), "muted", "soft".
+#
+# Wherever a field name is asked for you can write "Tags" to use Asana's
+# built-in tags. Tasks can hold several tags at once, so each one counts
+# toward every tag it carries.
 #
 # Both figures and breakdowns accept these optional filters:
 #
@@ -68,6 +75,7 @@ SECTIONS = [
         "figures": [
             {"label": "Performances", "sum": "Number of Sessions"},
             {"label": "Individuals Reached", "sum": "Number in Audience"},
+            {"label": "Facilities Served", "unique": "Tags", "list": True},
         ],
         "breakdowns": [
             {
@@ -135,13 +143,16 @@ FIELDS_WE_WANT = ",".join([
     "name",
     "completed",
     "due_on",
+    "tags.name",
     "custom_fields.name",
     "custom_fields.display_value",
     "custom_fields.number_value",
     "custom_fields.date_value",
+    "custom_fields.multi_enum_values.name",
 ])
 
 DUE_DATE_ALIASES = {"due date", "due on", "due_on"}
+TAG_ALIASES = {"tags", "tag"}
 
 
 class AsanaProblem(Exception):
@@ -199,12 +210,33 @@ def fetch_all_tasks(project_id, token):
     return tasks
 
 
-def field_value(task, field_name):
+def values_for(task, field_name):
+    """
+    Every value a task holds for one field, as a list.
+
+    Most fields hold a single value, so the list has one entry. Asana's
+    built-in tags and multi-select fields can hold several at once, which
+    is why this always returns a list.
+    """
     for field in task.get("custom_fields", []):
         if field.get("name") == field_name:
+            multi = field.get("multi_enum_values")
+            if multi:
+                return [m["name"] for m in multi if m.get("name")]
             value = field.get("display_value")
-            return value if value not in ("", None) else None
-    return None
+            return [value] if value not in ("", None) else []
+
+    # Asana's built-in tags live outside custom fields.
+    if field_name.strip().lower() in TAG_ALIASES:
+        return [t["name"] for t in (task.get("tags") or []) if t.get("name")]
+
+    return []
+
+
+def field_value(task, field_name):
+    """The single value of a field, or None. Used for filtering."""
+    found = values_for(task, field_name)
+    return found[0] if found else None
 
 
 def field_number(task, field_name):
@@ -239,7 +271,7 @@ def field_date(task, field_name):
 
 def matches_filter(task, conditions):
     for field_name, expected in (conditions or {}).items():
-        if field_value(task, field_name) != expected:
+        if expected not in values_for(task, field_name):
             return False
     return True
 
@@ -295,17 +327,25 @@ def build_section(section, tasks, available):
             continue
 
         rows = eligible_tasks(tasks, spec)
+        figure = {"label": spec["label"]}
 
         if "unique" in spec:
-            seen = {field_value(t, spec["unique"]) for t in rows}
-            seen.discard(None)
-            total = len(seen)
+            seen = set()
+            for task in rows:
+                seen.update(values_for(task, spec["unique"]))
+            figure["value"] = len(seen)
+            if spec.get("list"):
+                # Sorted so the popup reads alphabetically, and so the
+                # file doesn't churn between runs.
+                figure["items"] = sorted(seen, key=lambda s: s.lower())
         elif "sum" in spec:
-            total = sum(field_number(t, spec["sum"]) for t in rows)
+            figure["value"] = tidy_number(
+                sum(field_number(t, spec["sum"]) for t in rows)
+            )
         else:
-            total = len(rows)
+            figure["value"] = len(rows)
 
-        figures.append({"label": spec["label"], "value": tidy_number(total)})
+        figures.append(figure)
 
     breakdowns = []
     if available:
@@ -313,7 +353,11 @@ def build_section(section, tasks, available):
             rows = eligible_tasks(tasks, spec)
             tally = Counter()
             for task in rows:
-                tally[field_value(task, spec["group_by"]) or "Not set"] += 1
+                found = values_for(task, spec["group_by"])
+                if not found:
+                    tally["Not set"] += 1
+                for value in found:
+                    tally[value] += 1
 
             if spec.get("order"):
                 # Show exactly these categories, in this order, zeros included.
@@ -364,9 +408,9 @@ def main():
         for project_id, tasks in cache.items():
             cache[project_id] = [t for t in tasks if not t.get("completed")]
 
-    # Print every field name found, per project. When a number comes back
-    # as zero, this is where you check your spelling.
-    print("\nField names available on your tasks:")
+    # Print what each board offers. When a number comes back as zero,
+    # this is where you check your spelling.
+    print("\nWhat's available on your tasks:")
     for project_id, tasks in cache.items():
         names = sorted({
             field["name"]
@@ -374,11 +418,25 @@ def main():
             for field in task.get("custom_fields", [])
             if field.get("name")
         })
+        tag_names = sorted({
+            tag["name"]
+            for task in tasks
+            for tag in (task.get("tags") or [])
+            if tag.get("name")
+        })
         print(f"  {project_id}:")
+        print("    fields:")
         for name in names:
-            print(f"    - {name}")
+            print(f"      - {name}")
         if not names:
-            print("    (no custom fields found)")
+            print("      (none found)")
+        print(f"    tags ({len(tag_names)} distinct):")
+        for name in tag_names[:40]:
+            print(f"      - {name}")
+        if len(tag_names) > 40:
+            print(f"      ... and {len(tag_names) - 40} more")
+        if not tag_names:
+            print("      (none found)")
     print()
 
     output_sections = []
@@ -389,7 +447,7 @@ def main():
         available = bool(ids)
 
         if not ids:
-            note = "No connection"
+            note = "Not connected yet"
         else:
             broken = [pid for pid in ids if pid in failures]
             if broken:
