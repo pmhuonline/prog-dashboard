@@ -389,7 +389,7 @@ def main():
         available = bool(ids)
 
         if not ids:
-            note = "Not connected yet"
+            note = "No connection"
         else:
             broken = [pid for pid in ids if pid in failures]
             if broken:
