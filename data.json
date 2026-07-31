@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-07-31T22:58:20+00:00",
+  "updated": "2026-07-31T22:59:48+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -60,38 +60,22 @@
     },
     {
       "name": "NV Reports",
-      "note": null,
+      "note": "Could not read this board",
       "figures": [
         {
           "label": "Lessons",
-          "value": 6968
+          "value": null
         },
         {
           "label": "Enrollment 2026-2027",
-          "value": 0
+          "value": null
         },
         {
           "label": "Instruments Provided",
           "value": 14
         }
       ],
-      "breakdowns": [
-        {
-          "label": "Tech Issues",
-          "items": [
-            {
-              "name": "Yes",
-              "value": 44,
-              "color": "accent"
-            },
-            {
-              "name": "No",
-              "value": 517,
-              "color": "live"
-            }
-          ]
-        }
-      ]
+      "breakdowns": []
     },
     {
       "name": "MFTF Metrics",
