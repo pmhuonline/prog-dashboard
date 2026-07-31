@@ -5,14 +5,17 @@ name: Refresh dashboard data
 
 on:
   # Run at the top of every hour.
-  # The five numbers mean: minute, hour, day, month, weekday.
-  # "0 * * * *"     = every hour
-  # "0 6 * * *"     = once a day at 6am UTC
-  # "0 6 * * 1"     = Mondays at 6am UTC
   schedule:
     - cron: "0 * * * *"
 
-  # Also lets you run it by hand from the Actions tab.
+  # Also run whenever the config file changes.
+  push:
+    branches: [main]
+    paths:
+      - "fetch-asana.py"
+      - ".github/workflows/refresh-dashboard.yml"
+
+  # And lets you run it by hand from the Actions tab.
   workflow_dispatch:
 
 permissions:
