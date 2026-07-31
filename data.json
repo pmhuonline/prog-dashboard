@@ -1,0 +1,69 @@
+{
+  "title": "Program Metrics",
+  "updated": "2026-07-31T20:38:35+00:00",
+  "sections": [
+    {
+      "name": "VSI Reports",
+      "note": null,
+      "figures": [
+        {
+          "label": "Performances",
+          "value": 4070
+        },
+        {
+          "label": "Individuals Reached",
+          "value": 25430
+        }
+      ],
+      "breakdowns": [
+        {
+          "label": "Tech Status",
+          "items": [
+            {
+              "name": "Yes",
+              "value": 24
+            },
+            {
+              "name": "No",
+              "value": 586
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NV Reports",
+      "note": null,
+      "figures": [
+        {
+          "label": "Lessons",
+          "value": 6968
+        }
+      ],
+      "breakdowns": []
+    },
+    {
+      "name": "MFTF Metrics",
+      "note": "Not connected yet",
+      "figures": [
+        {
+          "label": "Students",
+          "value": null
+        },
+        {
+          "label": "Graduates",
+          "value": null
+        },
+        {
+          "label": "Compositions",
+          "value": null
+        },
+        {
+          "label": "Instructional Hours",
+          "value": null
+        }
+      ],
+      "breakdowns": []
+    }
+  ]
+}
