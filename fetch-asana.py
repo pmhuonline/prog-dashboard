@@ -88,7 +88,7 @@ SECTIONS = [
             {"label": "Performances", "sum": "Number of Sessions"},
             {"label": "Individuals Reached", "sum": "Number in Audience"},
             {
-                "label": "Facilities Served",
+                "label": "Partner Facilities",
                 "unique": "Tags",
                 "list": True,
                 # Not a facility - left out of the count entirely.
