@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-07-31T22:51:56+00:00",
+  "updated": "2026-07-31T22:58:20+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -16,7 +16,7 @@
         },
         {
           "label": "Facilities Served",
-          "value": 21,
+          "value": 19,
           "items": [
             "Art Pharmacy",
             "Cedar Sinai LA",
@@ -26,9 +26,8 @@
             "Huntington Hospital",
             "Monument Health",
             "NYP",
-            "Other",
             "Renaissance Healthcare",
-            "Salastina / Huntington / UCLA",
+            "Salastina",
             "Scandia Village / Midsummer",
             "Scripps Encinitas",
             "Sharp Memorial",
@@ -37,7 +36,6 @@
             "UCLA",
             "VA Eastern Colorado",
             "Wellbridge Rehabilitation",
-            "Wellbridge Rehabilitation Center",
             "Wyckoff Heights Medical Center"
           ]
         }
