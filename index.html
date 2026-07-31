@@ -1,395 +1,317 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Program Metrics</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500&family=Karla:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program Metrics · PMHU</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --paper:  #E6E1E8;
-    --ink:    #191320;
-    --muted:  #6B6272;
-    --plum:   #4C1F45;
-    --brass:  #A9752B;
-    --sage:   #4E6B63;
-    --rule:   rgba(25, 19, 32, 0.16);
-    --rule-strong: rgba(25, 19, 32, 0.45);
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    --display: "Fraunces", Georgia, serif;
-    --body:    "Karla", system-ui, sans-serif;
-    --data:    "IBM Plex Mono", ui-monospace, monospace;
-  }
+:root {
+  /* Light Theme Colors */
+  --bg: #ffffff;
+  --bg2: #f8f9fa;
+  --bg3: #ffffff;
+  --border: #e5e7eb;
+  --border2: #d1d5db;
 
-  * { box-sizing: border-box; }
+  /* Typography Colors */
+  --muted: #6b7280;
+  --soft: #4b5563;
+  --body: #000000;
+  --head: #000000;
 
-  body {
-    margin: 0;
-    padding: clamp(1.5rem, 5vw, 4.5rem) clamp(1.25rem, 5vw, 3rem) 4rem;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--body);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
+  /* PMHU Coral/Pink Accent */
+  --accent: #f05c5c;
 
-  .sheet { max-width: 62rem; margin: 0 auto; }
+  /* Tier accent */
+  --tier-bg: #fff5f5; --tier-lo: #fca5a5;
 
-  /* ---- masthead ---- */
+  /* Status Badges */
+  --live: #4ebad9;
+  --dev: #636363;
+  --live-bg: #f0fbff;
+  --dev-bg: #f3f4f6;
+}
 
-  .masthead {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-  .eyebrow {
-    font-family: var(--data);
-    font-size: 0.7rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 0;
-  }
+/* HEADER */
+.hdr{display:flex;align-items:center;gap:1.25rem;padding:0.8rem 1.75rem;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;}
+.hdr-logo{font-family:'Oswald',sans-serif;font-size:1.1rem;font-weight:500;letter-spacing:0.5px;color:var(--head);line-height:1.2;text-transform:uppercase;}
+.hdr-logo span{color:var(--accent);font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;text-transform:none;}
+.hdr-div{width:1px;height:24px;background:var(--border2);}
+.hdr-eye{font-size:0.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;}
+.hdr-badges{display:flex;gap:.45rem;margin-left:auto;flex-wrap:nowrap;flex-shrink:0;align-items:center;}
+.badge{font-size:.62rem;font-weight:600;letter-spacing:.05em;padding:.18rem .5rem;border-radius:3px;display:flex;align-items:center;gap:.28rem;white-space:nowrap;flex-shrink:0;}
+.badge-live{background:var(--live-bg);color:var(--live);border:1px solid #a7e2f2;}
+.badge-dev{background:var(--dev-bg);color:var(--dev);border:1px solid #d1d5db;}
+.bdot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+.btn-wiki{font-size:.62rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:.18rem .6rem;border-radius:3px;display:flex;align-items:center;gap:.28rem;background:#fff5f5;
+  color:var(--accent);border:1px solid var(--accent);text-decoration:none;white-space:nowrap;flex-shrink:0;
+  transition:background 0.15s,color 0.15s;margin-left:0.5rem;}
+.btn-wiki:hover{background:var(--accent);color:#ffffff;}
 
-  .title {
-    font-family: var(--display);
-    font-optical-sizing: auto;
-    font-weight: 300;
-    font-size: clamp(2.75rem, 9vw, 5rem);
-    line-height: 0.95;
-    letter-spacing: -0.02em;
-    margin: 0.75rem 0 0;
-  }
+/* PAGE */
+.page{flex:1;padding:1.75rem 1.75rem 2.5rem;max-width:1180px;width:100%;margin:0 auto;}
 
-  /* ---- one section per Asana board ---- */
+/* BOARD SECTION */
+.board{margin-bottom:2.4rem;animation:fu .18s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
-  .board {
-    border-top: 1px solid var(--rule-strong);
-    padding-top: 1.5rem;
-    margin-top: 3.5rem;
-  }
+.board-head{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;padding-bottom:.6rem;border-bottom:1px solid var(--border);margin-bottom:1rem;}
+.board-name{font-family:'Oswald',sans-serif;font-size:1.05rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--head);}
+.sp-pill{font-size:.6rem;font-weight:600;padding:.15rem .48rem;border-radius:3px;display:flex;align-items:center;gap:.28rem;}
+.sp-live{background:var(--live-bg);color:var(--live);border:1px solid #a7e2f2;}
+.sp-dev{background:var(--dev-bg);color:var(--dev);border:1px solid #d1d5db;}
+.sp-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
 
-  .board-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
-  }
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.55rem;}
+.stat{background:var(--bg3);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:5px;padding:.85rem 1rem;}
+.stat-label{display:block;font-size:.6rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;}
+.stat-value{font-family:'Oswald',sans-serif;font-size:2.35rem;font-weight:500;color:var(--head);line-height:1.05;display:block;}
+.stat.is-empty{border-left-color:var(--border2);}
+.stat.is-empty .stat-value{color:var(--border2);}
 
-  .board-name {
-    font-family: var(--display);
-    font-weight: 500;
-    font-size: clamp(1.4rem, 3.5vw, 1.9rem);
-    letter-spacing: -0.01em;
-    margin: 0;
-  }
+/* BAR GROUPS */
+.group{margin-top:1.4rem;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.9rem 1.05rem 1rem;}
+.group-label{font-size:.6rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem;}
+.bar-row{display:grid;grid-template-columns:110px 1fr 62px;gap:.75rem;align-items:center;padding:.3rem 0;}
+.bar-name{font-size:.75rem;color:var(--soft);overflow-wrap:anywhere;}
+.bar-track{height:9px;background:var(--dev-bg);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;width:0;border-radius:3px;transition:width 600ms ease;}
+.bar-value{font-family:'Oswald',sans-serif;font-size:1rem;font-weight:500;color:var(--head);text-align:right;}
 
-  .board-note {
-    font-family: var(--data);
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border: 1px solid var(--rule);
-    border-radius: 999px;
-    padding: 0.2rem 0.7rem;
-  }
+/* TBD / NOT CONNECTED */
+.tbd{background:#f9fafb;border:1px dashed #9ca3af;border-radius:6px;padding:.8rem .9rem;margin-top:.9rem;}
+.tbd-l{font-size:.6rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#4b5563;margin-bottom:.4rem;}
+.tbd-b{font-size:.76rem;color:#4b5563;line-height:1.65;font-style:italic;}
 
-  /* ---- big numbers ---- */
+/* NOTICE */
+.notice{background:#f9fafb;border:1px dashed #9ca3af;border-radius:6px;padding:1rem 1.1rem;font-size:.78rem;color:var(--soft);line-height:1.7;max-width:44rem;}
+.notice code{font-family:ui-monospace,monospace;font-size:.85em;background:var(--dev-bg);border:1px solid var(--border);padding:.08em .35em;border-radius:3px;}
 
-  .figures {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
-  }
+/* FOOTER */
+.dfn{padding:.65rem 1.75rem;border-top:1px solid var(--border);background:var(--bg2);font-size:.67rem;color:var(--muted);flex-shrink:0;line-height:1.5;}
 
-  .figure {
-    padding: 0.25rem 1.5rem 0.25rem 1.5rem;
-    border-left: 1px solid var(--rule);
-  }
-  .figure:first-child { border-left: 0; padding-left: 0; }
+/* MOBILE */
+@media(max-width:720px){
+  .hdr{flex-direction:column;align-items:flex-start;gap:8px;padding:12px 15px;}
+  .hdr-div{display:none;}
+  .hdr-badges{margin-left:0;flex-wrap:wrap;}
+  .page{padding:1.25rem 15px 2rem;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .stat-value{font-size:1.9rem;}
+  .bar-row{grid-template-columns:88px 1fr 48px;gap:.5rem;}
+  .dfn{padding:.65rem 15px;}
+}
 
-  .figure-label {
-    font-family: var(--data);
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: block;
-    margin-bottom: 0.4rem;
-  }
-
-  .figure-value {
-    font-family: var(--display);
-    font-weight: 500;
-    font-size: clamp(2.25rem, 6vw, 3.4rem);
-    line-height: 1;
-    letter-spacing: -0.03em;
-    font-variant-numeric: tabular-nums;
-  }
-  .figure-value.is-empty { color: var(--muted); font-weight: 300; }
-
-  /* ---- bars resting on a staff line ---- */
-
-  .group { margin-top: 2.75rem; }
-
-  .group-label {
-    font-family: var(--data);
-    font-size: 0.7rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--plum);
-    margin: 0 0 1.25rem;
-  }
-
-  .bar-row {
-    display: grid;
-    grid-template-columns: minmax(5rem, 9rem) 1fr auto;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.5rem 0;
-  }
-
-  .bar-name { font-size: 0.95rem; overflow-wrap: anywhere; }
-
-  .bar-track {
-    position: relative;
-    height: 1px;
-    background: var(--rule);
-  }
-
-  .bar-fill {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 0.7rem;
-    width: 0;
-    border-radius: 1px;
-    transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .bar-value {
-    font-family: var(--data);
-    font-size: 0.85rem;
-    font-variant-numeric: tabular-nums;
-    min-width: 3.5ch;
-    text-align: right;
-  }
-
-  /* ---- states ---- */
-
-  .notice {
-    font-size: 1rem;
-    color: var(--muted);
-    max-width: 34rem;
-    margin-top: 3rem;
-  }
-  .notice code {
-    font-family: var(--data);
-    font-size: 0.85em;
-    background: rgba(25, 19, 32, 0.07);
-    padding: 0.1em 0.35em;
-    border-radius: 2px;
-  }
-
-  footer {
-    font-family: var(--data);
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-top: 1px solid var(--rule);
-    margin-top: 4rem;
-    padding-top: 1.25rem;
-  }
-
-  @media (max-width: 34rem) {
-    .figure {
-      border-left: 0;
-      padding-left: 0;
-      padding-right: 0;
-      border-top: 1px solid var(--rule);
-      padding-top: 1.1rem;
-      margin-top: 1.1rem;
-    }
-    .figure:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
-    .bar-row { grid-template-columns: 1fr auto; }
-    .bar-track { grid-column: 1 / -1; order: 3; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .bar-fill { transition: none; }
-  }
+@media(prefers-reduced-motion:reduce){
+  .bar-fill{transition:none;}
+  .board{animation:none;}
+}
 </style>
 </head>
 <body>
-<div class="sheet">
 
-  <header class="masthead">
-    <p class="eyebrow">Impact dashboard</p>
-    <p class="eyebrow" id="updated"></p>
-  </header>
-  <h1 class="title" id="title">Program Metrics</h1>
+<header class="hdr">
+  <div class="hdr-logo" id="brand">Program Metrics <span>/ PMHU</span></div>
+  <div class="hdr-div"></div>
+  <div class="hdr-eye" id="updated">Loading…</div>
+  <div class="hdr-badges">
+    <div class="badge badge-live"><span class="bdot"></span>Connected</div>
+    <div class="badge badge-dev"><span class="bdot"></span>In development</div>
+    <!-- Point this at whichever wiki page this dashboard belongs under -->
+    <a href="https://sites.google.com/pmhu.org/pmhu-wiki/" target="_blank" class="btn-wiki">Back to Wiki ↗&#xFE0E;</a>
+  </div>
+</header>
 
-  <main id="boards"></main>
+<main class="page" id="boards"></main>
 
-  <footer>Figures drawn from Asana</footer>
-</div>
+<div class="dfn">Source: live Asana project data · Refreshed hourly by an automated job · Figures reflect tasks present in each board at the time of the last refresh.</div>
 
 <script>
-  var BAR_COLORS = ["var(--plum)", "var(--brass)", "var(--sage)"];
-  var animationOrder = 0;
+// Bars cycle through the PMHU palette, one colour per chart.
+var BAR_COLORS = ["var(--accent)", "var(--live)", "var(--dev)"];
 
-  function formatNumber(value) {
-    return Number(value).toLocaleString("en-US");
-  }
+function formatNumber(value) {
+  return Number(value).toLocaleString("en-US");
+}
 
-  function formatDate(isoString) {
-    var when = new Date(isoString);
-    if (isNaN(when)) return "";
-    return "Updated " + when.toLocaleString("en-US", {
-      day: "numeric", month: "short", year: "numeric",
-      hour: "numeric", minute: "2-digit"
+function formatDate(isoString) {
+  var when = new Date(isoString);
+  if (isNaN(when)) return "";
+  return "Live from Asana · Updated " + when.toLocaleString("en-US", {
+    day: "numeric", month: "short", year: "numeric",
+    hour: "numeric", minute: "2-digit"
+  });
+}
+
+function makeStats(figures) {
+  var grid = document.createElement("div");
+  grid.className = "stats";
+
+  figures.forEach(function (figure) {
+    var card = document.createElement("div");
+    card.className = "stat";
+
+    var label = document.createElement("span");
+    label.className = "stat-label";
+    label.textContent = figure.label;
+
+    var value = document.createElement("strong");
+    value.className = "stat-value";
+
+    if (figure.value === null || figure.value === undefined) {
+      card.classList.add("is-empty");
+      value.textContent = "\u2014";  // em dash
+    } else {
+      value.textContent = formatNumber(figure.value);
+    }
+
+    card.appendChild(label);
+    card.appendChild(value);
+    grid.appendChild(card);
+  });
+
+  return grid;
+}
+
+function makeBarGroup(group, colorIndex, delayCounter) {
+  var box = document.createElement("div");
+  box.className = "group";
+
+  var heading = document.createElement("div");
+  heading.className = "group-label";
+  heading.textContent = group.label;
+  box.appendChild(heading);
+
+  var counts = group.items.map(function (item) { return item.value; });
+  var largest = Math.max.apply(null, counts.concat([1]));
+
+  group.items.forEach(function (item) {
+    var row = document.createElement("div");
+    row.className = "bar-row";
+
+    var name = document.createElement("div");
+    name.className = "bar-name";
+    name.textContent = item.name;
+
+    var track = document.createElement("div");
+    track.className = "bar-track";
+
+    var fill = document.createElement("div");
+    fill.className = "bar-fill";
+    fill.style.background = BAR_COLORS[colorIndex % BAR_COLORS.length];
+    track.appendChild(fill);
+
+    var value = document.createElement("div");
+    value.className = "bar-value";
+    value.textContent = formatNumber(item.value);
+
+    row.appendChild(name);
+    row.appendChild(track);
+    row.appendChild(value);
+    box.appendChild(row);
+
+    var width = (item.value / largest) * 100;
+    var delay = 120 + (delayCounter.count * 60);
+    delayCounter.count += 1;
+    setTimeout(function () { fill.style.width = width + "%"; }, delay);
+  });
+
+  return box;
+}
+
+function drawBoards(sections) {
+  var host = document.getElementById("boards");
+  host.innerHTML = "";
+  var delayCounter = { count: 0 };
+
+  sections.forEach(function (section, index) {
+    var board = document.createElement("section");
+    board.className = "board";
+
+    var head = document.createElement("div");
+    head.className = "board-head";
+
+    var name = document.createElement("h2");
+    name.className = "board-name";
+    name.textContent = section.name;
+    head.appendChild(name);
+
+    var pill = document.createElement("span");
+    var dot = document.createElement("span");
+    dot.className = "sp-dot";
+    pill.appendChild(dot);
+
+    if (section.note) {
+      pill.className = "sp-pill sp-dev";
+      pill.appendChild(document.createTextNode(section.note));
+    } else {
+      pill.className = "sp-pill sp-live";
+      pill.appendChild(document.createTextNode("Connected"));
+    }
+    head.appendChild(pill);
+    board.appendChild(head);
+
+    board.appendChild(makeStats(section.figures || []));
+
+    (section.breakdowns || []).forEach(function (group) {
+      board.appendChild(makeBarGroup(group, index, delayCounter));
     });
-  }
 
-  function makeFigures(figures) {
-    var grid = document.createElement("div");
-    grid.className = "figures";
+    if (section.note) {
+      var tbd = document.createElement("div");
+      tbd.className = "tbd";
+      var tbdLabel = document.createElement("div");
+      tbdLabel.className = "tbd-l";
+      tbdLabel.textContent = "✦ Awaiting data";
+      var tbdBody = document.createElement("div");
+      tbdBody.className = "tbd-b";
+      tbdBody.textContent =
+        "This board isn't reporting into the dashboard yet. Figures will " +
+        "appear here once the Asana project is built and connected.";
+      tbd.appendChild(tbdLabel);
+      tbd.appendChild(tbdBody);
+      board.appendChild(tbd);
+    }
 
-    figures.forEach(function (figure) {
-      var block = document.createElement("div");
-      block.className = "figure";
+    host.appendChild(board);
+  });
+}
 
-      var label = document.createElement("span");
-      label.className = "figure-label";
-      label.textContent = figure.label;
-
-      var value = document.createElement("div");
-      value.className = "figure-value";
-      if (figure.value === null || figure.value === undefined) {
-        value.classList.add("is-empty");
-        value.textContent = "\u2014";  // em dash
-      } else {
-        value.textContent = formatNumber(figure.value);
-      }
-
-      block.appendChild(label);
-      block.appendChild(value);
-      grid.appendChild(block);
-    });
-
-    return grid;
-  }
-
-  function makeBreakdown(group, colorIndex) {
-    var section = document.createElement("section");
-    section.className = "group";
-
-    var heading = document.createElement("h3");
-    heading.className = "group-label";
-    heading.textContent = group.label;
-    section.appendChild(heading);
-
-    var counts = group.items.map(function (item) { return item.value; });
-    var largest = Math.max.apply(null, counts.concat([1]));
-
-    group.items.forEach(function (item) {
-      var row = document.createElement("div");
-      row.className = "bar-row";
-
-      var name = document.createElement("div");
-      name.className = "bar-name";
-      name.textContent = item.name;
-
-      var track = document.createElement("div");
-      track.className = "bar-track";
-
-      var fill = document.createElement("div");
-      fill.className = "bar-fill";
-      fill.style.background = BAR_COLORS[colorIndex % BAR_COLORS.length];
-      track.appendChild(fill);
-
-      var value = document.createElement("div");
-      value.className = "bar-value";
-      value.textContent = formatNumber(item.value);
-
-      row.appendChild(name);
-      row.appendChild(track);
-      row.appendChild(value);
-      section.appendChild(row);
-
-      // Let the bars arrive one after another, like notes.
-      var width = (item.value / largest) * 100;
-      var delay = 150 + (animationOrder * 70);
-      animationOrder += 1;
-      setTimeout(function () { fill.style.width = width + "%"; }, delay);
-    });
-
-    return section;
-  }
-
-  function drawBoards(sections) {
-    var host = document.getElementById("boards");
-    host.innerHTML = "";
-    animationOrder = 0;
-
-    sections.forEach(function (section, index) {
-      var board = document.createElement("section");
-      board.className = "board";
-
-      var head = document.createElement("div");
-      head.className = "board-head";
-
-      var name = document.createElement("h2");
-      name.className = "board-name";
-      name.textContent = section.name;
-      head.appendChild(name);
-
-      if (section.note) {
-        var note = document.createElement("span");
-        note.className = "board-note";
-        note.textContent = section.note;
-        head.appendChild(note);
-      }
-
-      board.appendChild(head);
-      board.appendChild(makeFigures(section.figures || []));
-
-      (section.breakdowns || []).forEach(function (group) {
-        board.appendChild(makeBreakdown(group, index));
-      });
-
-      host.appendChild(board);
-    });
-  }
-
-  // The ?t= on the end stops browsers serving a stale copy.
-  fetch("data.json?t=" + Date.now())
-    .then(function (response) {
-      if (!response.ok) throw new Error("missing");
-      return response.json();
-    })
-    .then(function (data) {
-      var title = data.title || "Dashboard";
-      document.getElementById("title").textContent = title;
-      document.title = title;
-      document.getElementById("updated").textContent = formatDate(data.updated);
-      drawBoards(data.sections || []);
-    })
-    .catch(function () {
-      document.getElementById("updated").textContent = "";
-      document.getElementById("boards").innerHTML =
-        '<p class="notice">No figures yet. Run the ' +
-        "<code>Refresh dashboard data</code> action from the Actions tab " +
-        "of this repository, then reload this page.</p>";
-    });
+// The ?t= on the end stops browsers serving a stale copy.
+fetch("data.json?t=" + Date.now())
+  .then(function (response) {
+    if (!response.ok) throw new Error("missing");
+    return response.json();
+  })
+  .then(function (data) {
+    var title = data.title || "Program Metrics";
+    document.getElementById("brand").innerHTML =
+      title.replace(/[<>&]/g, "") + ' <span>/ PMHU</span>';
+    document.title = title + " · PMHU";
+    document.getElementById("updated").textContent = formatDate(data.updated);
+    drawBoards(data.sections || []);
+  })
+  .catch(function () {
+    document.getElementById("updated").textContent = "No data loaded";
+    document.getElementById("boards").innerHTML =
+      '<div class="notice">No figures yet. Run the ' +
+      "<code>Refresh dashboard data</code> action from the Actions tab of " +
+      "this repository, then reload this page.</div>";
+  });
 </script>
 </body>
 </html>
