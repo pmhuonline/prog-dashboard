@@ -30,14 +30,36 @@ DASHBOARD_TITLE = "Program Metrics"
 #               You can also pass a list of IDs to combine several boards
 #               into one section, e.g. ["1208...", "1212..."]
 #
-#   "figures"   the big numbers
-#                 "sum"   add up a number field across every task
-#                         (leave "sum" out entirely to just count tasks)
-#                 "where" optional filter, e.g. {"Status": "New"}
+#   "figures"   the big numbers, shown left to right in the order listed.
+#               Pick ONE of these four:
+#                 "sum"     add up a number field across every task
+#                 "unique"  count how many different values appear in a
+#                           field - use for "how many students", not
+#                           "how many lessons"
+#                 "fixed"   a number you type in and maintain by hand.
+#                           Asana is never asked about it.
+#                 (none)    just count the tasks
 #
 #   "breakdowns"  the bar charts - group tasks by a field, count each value
-#                 "order" optional, forces the categories into this order
-#                         and shows them even when the count is zero
+#                 "order"   optional, forces the categories into this order
+#                           and shows them even when the count is zero
+#                 "rename"  optional, changes the words on the bars without
+#                           changing what's asked of Asana
+#                 "colors"  optional, sets each bar's colour. Use the house
+#                           palette names: "accent" (coral), "live" (teal),
+#                           "dev" (grey), "muted", "soft".
+#
+# Both figures and breakdowns accept these optional filters:
+#
+#   "where"     only tasks whose field matches, e.g. {"Status": "New"}
+#   "between"   only tasks whose date field falls in a range:
+#                 {"field": "Lesson Date",
+#                  "from": "2026-09-01", "to": "2027-06-30"}
+#               Dates must be written YYYY-MM-DD. Tasks with that date
+#               field left blank are excluded.
+#
+# Note: "order", "rename" and "colors" all key off the value as Asana
+# spells it, so renaming a bar never breaks its ordering or colour.
 #
 SECTIONS = [
     {
@@ -52,6 +74,7 @@ SECTIONS = [
                 "label": "Tech Issues",
                 "group_by": "Tech Status",
                 "order": ["Yes", "No"],
+                "colors": {"Yes": "accent", "No": "live"},
             },
         ],
     },
@@ -60,12 +83,24 @@ SECTIONS = [
         "project": "1212646865573131",
         "figures": [
             {"label": "Lessons", "sum": "Number of Sessions"},
+            {
+                "label": "Enrollment 2026-2027",
+                "unique": "Student",
+                "between": {
+                    "field": "Lesson Date",
+                    "from": "2026-09-01",
+                    "to": "2027-06-30",
+                },
+            },
+            # Maintained by hand - edit the number below and commit.
+            {"label": "Instruments Provided", "fixed": 14},
         ],
         "breakdowns": [
             {
                 "label": "Tech Issues",
                 "group_by": "Tech Status",
                 "order": ["Yes", "No"],
+                "colors": {"Yes": "accent", "No": "live"},
             },
         ],
     },
@@ -99,10 +134,14 @@ API_ROOT = "https://app.asana.com/api/1.0"
 FIELDS_WE_WANT = ",".join([
     "name",
     "completed",
+    "due_on",
     "custom_fields.name",
     "custom_fields.display_value",
     "custom_fields.number_value",
+    "custom_fields.date_value",
 ])
+
+DUE_DATE_ALIASES = {"due date", "due on", "due_on"}
 
 
 class AsanaProblem(Exception):
@@ -182,11 +221,48 @@ def field_number(task, field_name):
     return 0
 
 
+def field_date(task, field_name):
+    """Return a date as YYYY-MM-DD, or None if the task hasn't got one."""
+    for field in task.get("custom_fields", []):
+        if field.get("name") == field_name:
+            stamp = field.get("date_value") or {}
+            found = stamp.get("date") or stamp.get("date_time")
+            return found[:10] if found else None
+
+    # Fall back to Asana's own built-in due date.
+    if field_name.strip().lower() in DUE_DATE_ALIASES:
+        due = task.get("due_on")
+        return due[:10] if due else None
+
+    return None
+
+
 def matches_filter(task, conditions):
     for field_name, expected in (conditions or {}).items():
         if field_value(task, field_name) != expected:
             return False
     return True
+
+
+def within_range(task, window):
+    """True if the task's date sits inside the configured window."""
+    if not window:
+        return True
+    stamp = field_date(task, window["field"])
+    if not stamp:
+        return False  # no date recorded, so it can't be counted
+    # YYYY-MM-DD sorts correctly as plain text, so no date maths needed.
+    if window.get("from") and stamp < window["from"]:
+        return False
+    if window.get("to") and stamp > window["to"]:
+        return False
+    return True
+
+
+def eligible_tasks(tasks, spec):
+    """Apply both filters, in the order a person would expect."""
+    rows = [t for t in tasks if matches_filter(t, spec.get("where"))]
+    return [t for t in rows if within_range(t, spec.get("between"))]
 
 
 def tidy_number(value):
@@ -205,20 +281,36 @@ def build_section(section, tasks, available):
     """Turn one section of config into finished numbers."""
     figures = []
     for spec in section.get("figures", []):
+        # Hand-maintained numbers don't depend on Asana, so they show
+        # even when the board behind them isn't connected.
+        if "fixed" in spec:
+            figures.append({
+                "label": spec["label"],
+                "value": tidy_number(spec["fixed"]),
+            })
+            continue
+
         if not available:
             figures.append({"label": spec["label"], "value": None})
             continue
-        rows = [t for t in tasks if matches_filter(t, spec.get("where"))]
-        if "sum" in spec:
+
+        rows = eligible_tasks(tasks, spec)
+
+        if "unique" in spec:
+            seen = {field_value(t, spec["unique"]) for t in rows}
+            seen.discard(None)
+            total = len(seen)
+        elif "sum" in spec:
             total = sum(field_number(t, spec["sum"]) for t in rows)
         else:
             total = len(rows)
+
         figures.append({"label": spec["label"], "value": tidy_number(total)})
 
     breakdowns = []
     if available:
         for spec in section.get("breakdowns", []):
-            rows = [t for t in tasks if matches_filter(t, spec.get("where"))]
+            rows = eligible_tasks(tasks, spec)
             tally = Counter()
             for task in rows:
                 tally[field_value(task, spec["group_by"]) or "Not set"] += 1
@@ -234,6 +326,17 @@ def build_section(section, tasks, available):
                     {"name": name, "value": count}
                     for name, count in tally.most_common()
                 ]
+
+            # Colour and relabel using the value as Asana spells it, so
+            # these settings never have to be kept in step with each other.
+            rename = spec.get("rename") or {}
+            colors = spec.get("colors") or {}
+            for item in items:
+                asana_value = item["name"]
+                if asana_value in colors:
+                    item["color"] = colors[asana_value]
+                item["name"] = rename.get(asana_value, asana_value)
+
             breakdowns.append({"label": spec["label"], "items": items})
 
     return figures, breakdowns
