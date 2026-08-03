@@ -210,7 +210,7 @@ function formatNumber(value) {
 function formatDate(isoString) {
   var when = new Date(isoString);
   if (isNaN(when)) return "";
-  return "Live from Asana · Updated " + when.toLocaleString("en-US", {
+  return "Live Data Report · Updated " + when.toLocaleString("en-US", {
     day: "numeric", month: "short", year: "numeric",
     hour: "numeric", minute: "2-digit"
   });
