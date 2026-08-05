@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-08-05T13:17:05+00:00",
+  "updated": "2026-08-05T18:36:24+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -8,14 +8,14 @@
       "figures": [
         {
           "label": "Performances",
-          "value": 4074
+          "value": 4073
         },
         {
           "label": "Individuals Reached",
-          "value": 25448
+          "value": 25442
         },
         {
-          "label": "Partner Facilities",
+          "label": "Partner Organizations",
           "value": 19,
           "items": [
             "Art Pharmacy",
@@ -51,7 +51,7 @@
             },
             {
               "name": "No",
-              "value": 590,
+              "value": 589,
               "color": "live"
             }
           ]
@@ -64,7 +64,7 @@
       "figures": [
         {
           "label": "Lessons",
-          "value": 6970
+          "value": 6968
         },
         {
           "label": "Enrollment 2026-2027",
@@ -86,7 +86,7 @@
             },
             {
               "name": "No",
-              "value": 519,
+              "value": 517,
               "color": "live"
             }
           ]
