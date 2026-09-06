@@ -1,25 +1,62 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-09-06T05:16:46+00:00",
+  "updated": "2026-09-06T09:52:22+00:00",
   "sections": [
     {
       "name": "VSI Reports",
-      "note": "Could not read this board",
+      "note": null,
       "figures": [
         {
           "label": "Performances",
-          "value": null
+          "value": 4094
         },
         {
           "label": "Individuals Reached",
-          "value": null
+          "value": 25516
         },
         {
           "label": "Partner Organizations",
-          "value": null
+          "value": 19,
+          "items": [
+            "Art Pharmacy",
+            "Cedar Sinai LA",
+            "Columbia University Irving",
+            "Dartmouth-Hitchcock",
+            "Highland Hospital",
+            "Huntington Hospital",
+            "Monument Health",
+            "NYP",
+            "Renaissance Healthcare",
+            "Salastina",
+            "Scandia Village / Midsummer",
+            "Scripps Encinitas",
+            "Sharp Memorial",
+            "Strong Memorial / EPAM",
+            "Thomas Jefferson University",
+            "UCLA",
+            "VA Eastern Colorado",
+            "Wellbridge Rehabilitation",
+            "Wyckoff Heights Medical Center"
+          ]
         }
       ],
-      "breakdowns": []
+      "breakdowns": [
+        {
+          "label": "Tech Issues",
+          "items": [
+            {
+              "name": "Yes",
+              "value": 26,
+              "color": "accent"
+            },
+            {
+              "name": "No",
+              "value": 608,
+              "color": "live"
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "NV Reports",
