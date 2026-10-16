@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-16T20:13:06+00:00",
+  "updated": "2026-10-16T23:06:43+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -64,11 +64,11 @@
       "figures": [
         {
           "label": "Lessons",
-          "value": 7044
+          "value": 7055
         },
         {
           "label": "Enrollment 2026-2027",
-          "value": 22
+          "value": 23
         },
         {
           "label": "Instruments Provided",
@@ -81,12 +81,12 @@
           "items": [
             {
               "name": "Yes",
-              "value": 55,
+              "value": 58,
               "color": "accent"
             },
             {
               "name": "No",
-              "value": 582,
+              "value": 590,
               "color": "live"
             }
           ]
