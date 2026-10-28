@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-28T13:08:14+00:00",
+  "updated": "2026-10-28T13:24:06+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -165,7 +165,7 @@
               [
                 "Peter K",
                 "Kenya",
-                "Viola, Violin"
+                "Viola"
               ],
               [
                 "Sophia N",
@@ -197,8 +197,20 @@
           "link_text": "View enrollment"
         },
         {
-          "label": "Instruments Provided",
-          "value": 14
+          "label": "Instructors",
+          "value": 9,
+          "items": [
+            "Alexandros Darna",
+            "Donald Speer",
+            "Ian Maloney",
+            "James Preucil",
+            "Lindsay Flowers Koh",
+            "Luke Henderson",
+            "Peter Dudek",
+            "Sam Budish",
+            "Samuel Budish"
+          ],
+          "link_text": "Instructor roster"
         }
       ],
       "breakdowns": [
