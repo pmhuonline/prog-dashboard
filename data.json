@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-28T14:17:59+00:00",
+  "updated": "2026-10-28T14:19:45+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -261,7 +261,7 @@
           "link_text": "View enrollment"
         },
         {
-          "label": "Instructors",
+          "label": "Instructors 2026-2027",
           "value": 8,
           "items": [
             "Alexandros Darna",
