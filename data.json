@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-28T09:12:32+00:00",
+  "updated": "2026-10-28T12:41:52+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -8,24 +8,25 @@
       "figures": [
         {
           "label": "Performances",
-          "value": 4134
+          "value": 4135
         },
         {
           "label": "Individuals Reached",
-          "value": 25734
+          "value": 25744
         },
         {
           "label": "Partner Organizations",
-          "value": 19,
+          "value": 21,
           "items": [
             "Art Pharmacy",
-            "Cedar Sinai LA",
+            "Cedars-Sinai LA",
             "Columbia University Irving",
             "Dartmouth-Hitchcock",
             "Highland Hospital",
             "Huntington Hospital",
             "Monument Health",
             "NYP",
+            "Other - SocialRx",
             "Renaissance Healthcare",
             "Salastina",
             "Scandia Village / Midsummer",
@@ -36,7 +37,8 @@
             "UCLA",
             "VA Eastern Colorado",
             "Wellbridge Rehabilitation",
-            "Wyckoff Heights Medical Center"
+            "Wyckoff Heights Medical Center",
+            "Yale"
           ]
         }
       ],
@@ -51,7 +53,7 @@
             },
             {
               "name": "No",
-              "value": 646,
+              "value": 647,
               "color": "live"
             }
           ]
