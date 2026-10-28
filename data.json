@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-28T13:58:47+00:00",
+  "updated": "2026-10-28T14:10:10+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -9,11 +9,11 @@
       "figures": [
         {
           "label": "Performances",
-          "value": 4135
+          "value": 4134
         },
         {
           "label": "Individuals Reached",
-          "value": 25744
+          "value": 25734
         },
         {
           "label": "Partner Organizations",
@@ -43,7 +43,18 @@
         },
         {
           "label": "Musicians",
-          "value": 55,
+          "matched": {
+            "Celeste Pe\u00f1a": "Celeste Pena",
+            "Doori na": "Doori Na",
+            "ELENA Ariza": "Elena Stephanie Ariza",
+            "Elena Ariza": "Elena Stephanie Ariza",
+            "Nathan Choi": "Nathanial Choi",
+            "Sean mulligan": "Sean Mulligan",
+            "doori na": "Doori Na",
+            "emily a Webster-Zuber": "Emily Webster-Zuber",
+            "sean mulligan": "Sean Mulligan"
+          },
+          "value": 45,
           "items": [
             "Abby Smith",
             "Alex Norris",
@@ -55,16 +66,11 @@
             "Carrie Kennedy",
             "Cate Carson",
             "Celeste Pena",
-            "Celeste Pe\u00f1a",
             "Cole Leonard",
             "Daniel Kuehler",
             "Doori Na",
-            "Doori Na (Missing Entry 11/17)",
             "Elaina Spiro",
-            "Elena Ariza",
             "Elena Stephanie Ariza",
-            "emily a Webster-Zuber",
-            "Emily and Kaitlin Webster-Zuber",
             "Emily Webster-Zuber",
             "Eric Tsai",
             "Hannah Rubin",
@@ -73,14 +79,11 @@
             "Jacob Kelberman",
             "Jeremy Jordan",
             "Jeremy Klein",
-            "Jeremy Klein RIKER'S VISIT (with Lauren Conroy and Benjamin Grow)",
             "Jesse Nummelin",
             "Jessica Yuma",
             "Joel Pargman",
             "Juan-Salvador Carrasco",
             "Julia Schilz",
-            "Julia Vai",
-            "Julia Vari",
             "Julia Varsovie",
             "Kenneth Kam",
             "Marek Szpakiewicz",
@@ -90,7 +93,6 @@
             "Michelle Cobley",
             "Miranda Cuckson",
             "Miranda Werner",
-            "Nathan Choi",
             "Nathanial Choi",
             "Oryann Tsaig",
             "Patrick Peralta",
@@ -98,7 +100,6 @@
             "Sean Mulligan",
             "Shannon Ross",
             "Sofia Gilchenok",
-            "Starting count from Google Sheet",
             "Yuyu Ikeda"
           ],
           "link_text": "Artist roster"
@@ -115,7 +116,7 @@
             },
             {
               "name": "No",
-              "value": 647,
+              "value": 646,
               "color": "live"
             }
           ]
