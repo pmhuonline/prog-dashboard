@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-28T13:30:36+00:00",
+  "updated": "2026-10-28T13:48:22+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -239,8 +239,39 @@
           "value": null
         },
         {
-          "label": "Graduates",
-          "value": null
+          "label": "Facilities",
+          "value": 28,
+          "items": [
+            "Alameda County Santa Rita Jail",
+            "Amity Foundation",
+            "Central California Women's Facility",
+            "Century Regional Detention Facility",
+            "Elmwood Correctional Facility",
+            "High Desert Detention Center",
+            "La Entrada de Los Angeles",
+            "Lovelock Correctional Center",
+            "Manson Youth Institution",
+            "MAP Victorville",
+            "Northern Nevada Correctional Center",
+            "Pitchess Detention Center",
+            "Prototypes HR360",
+            "Rikers",
+            "Rite of Passage",
+            "San Bernardino MAP Program",
+            "San Francisco County Jail #2 (CJ2)",
+            "San Francisco County Jail #3 (CJ3)",
+            "Santa Clara Main Jail",
+            "Solano County Jail",
+            "Sonoma County Jail",
+            "Sonoma County Juvenile Hall",
+            "Sonoma Detention Center",
+            "Southern Desert",
+            "Tahoe Music Alive",
+            "The Jericho Project",
+            "Vista Detention Facility",
+            "West Valley"
+          ],
+          "link_text": "Our facilities"
         },
         {
           "label": "Compositions",
