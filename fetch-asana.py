@@ -32,6 +32,9 @@ DASHBOARD_TITLE = "Program Metrics"
 #               shows placeholder dashes instead of calling Asana.
 #               You can also pass a list of IDs to combine several boards
 #               into one section, e.g. ["1208...", "1212..."]
+#   "status"    optional, for a section with no project yet. Replaces the
+#               grey "No connection" label with a yellow one saying this,
+#               e.g. "In progress".
 #
 #   "figures"   the big numbers, shown left to right in the order listed.
 #               Pick ONE of these five:
@@ -189,6 +192,8 @@ SECTIONS = [
         # Board isn't built yet. Paste the project ID here when it is,
         # then replace each "REPLACE ME" with the real field name.
         "project": None,
+        # Shown as a yellow label next to the heading until then.
+        "status": "In progress",
         "figures": [
             {"label": "Students", "sum": "REPLACE ME"},
             {
@@ -702,10 +707,15 @@ def main():
         ids = project_ids_for(section)
         tasks = []
         note = None
+        note_color = None
         available = bool(ids)
 
         if not ids:
-            note = "No connection"
+            if section.get("status"):
+                note = section["status"]
+                note_color = "yellow"
+            else:
+                note = "No connection"
         else:
             broken = [pid for pid in ids if pid in failures]
             if broken:
@@ -719,6 +729,7 @@ def main():
         output_sections.append({
             "name": section["name"],
             "note": note,
+            "note_color": note_color,
             "figures": figures,
             "breakdowns": breakdowns,
         })
