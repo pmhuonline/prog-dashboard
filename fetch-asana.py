@@ -45,6 +45,16 @@ DASHBOARD_TITLE = "Program Metrics"
 #               Add "list": True to a "unique" figure and the card becomes
 #               clickable, opening a popup listing the values it counted.
 #
+#               Or add "table" to a "unique" figure for a popup table with
+#               one row per value counted. List the columns to show, using
+#               the exact Asana column names, e.g.
+#                 "table": ["Student", "Location", "Instrument"]
+#               If a student's tasks hold more than one value for a column
+#               (two instruments, say), the row shows all of them.
+#
+#               "link_text" changes the words at the bottom of a clickable
+#               card, e.g. "View enrollment". Leave it out for "View list".
+#
 #   "breakdowns"  the bar charts - group tasks by a field, count each value
 #                 "order"   optional, forces the categories into this order
 #                           and shows them even when the count is zero
@@ -131,6 +141,9 @@ SECTIONS = [
                     "from": "2026-09-01",
                     "to": "2027-06-30",
                 },
+                # Clicking the card opens a table, one row per student.
+                "table": ["Student", "Location", "Instrument"],
+                "link_text": "View enrollment",
             },
             # Maintained by hand - edit the number below and commit.
             {"label": "Instruments Provided", "fixed": 14},
@@ -372,6 +385,43 @@ def project_ids_for(section):
     return project if isinstance(project, list) else [project]
 
 
+def build_table(tasks, spec, key_fields):
+    """
+    One row per value counted, for the popup table.
+
+    A column that is the counted field shows that value itself. Any other
+    column gathers what that value's tasks hold - so a student taught two
+    instruments shows both - joined with commas.
+    """
+    columns = spec["table"]
+    gathered = {}
+    for task in tasks:
+        keys = set()
+        for field_name in key_fields:
+            keys.update(tidied_values(task, field_name, spec, set()))
+        for key in keys:
+            cells = gathered.setdefault(key, {c: set() for c in columns})
+            for column in columns:
+                if column not in key_fields:
+                    cells[column].update(values_for(task, column))
+
+    for column in columns:
+        if column in key_fields:
+            continue
+        if gathered and not any(cells[column] for cells in gathered.values()):
+            print(f"  ! {spec['label']}: table column '{column}' is empty - "
+                  "check the name matches the Asana column exactly")
+
+    rows = []
+    for key in sorted(gathered, key=lambda s: s.lower()):
+        rows.append([
+            key if column in key_fields
+            else ", ".join(sorted(gathered[key][column], key=str.lower))
+            for column in columns
+        ])
+    return {"columns": columns, "rows": rows}
+
+
 def build_section(section, tasks, available):
     """Turn one section of config into finished numbers."""
     figures = []
@@ -416,6 +466,10 @@ def build_section(section, tasks, available):
                 # Sorted so the popup reads alphabetically, and so the
                 # file doesn't churn between runs.
                 figure["items"] = sorted(found, key=lambda s: s.lower())
+            if spec.get("table"):
+                figure["table"] = build_table(rows, spec, field_names)
+            if spec.get("link_text"):
+                figure["link_text"] = spec["link_text"]
         elif "sum" in spec:
             figure["value"] = tidy_number(
                 sum(field_number(t, spec["sum"]) for t in rows)
