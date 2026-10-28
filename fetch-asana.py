@@ -6,8 +6,11 @@ You only need to edit the CONFIGURATION section below. Everything under
 "machinery" can be left alone.
 """
 
+import csv
+import io
 import json
 import os
+import re
 import sys
 import urllib.request
 import urllib.error
@@ -31,7 +34,7 @@ DASHBOARD_TITLE = "Program Metrics"
 #               into one section, e.g. ["1208...", "1212..."]
 #
 #   "figures"   the big numbers, shown left to right in the order listed.
-#               Pick ONE of these four:
+#               Pick ONE of these five:
 #                 "sum"     add up a number field across every task
 #                 "unique"  count how many different values appear in a
 #                           field - use for "how many students", not
@@ -40,6 +43,10 @@ DASHBOARD_TITLE = "Program Metrics"
 #                           them - a value found in both counts once.
 #                 "fixed"   a number you type in and maintain by hand.
 #                           Asana is never asked about it.
+#                 "sheet"   count the names in the first column of a
+#                           Google Sheet - paste the sheet's link. The
+#                           sheet must be shared as "Anyone with the link
+#                           can view". Asana is never asked about it.
 #                 (none)    just count the tasks
 #
 #               Add "list": True to a "unique" figure and the card becomes
@@ -184,7 +191,18 @@ SECTIONS = [
         "project": None,
         "figures": [
             {"label": "Students", "sum": "REPLACE ME"},
-            {"label": "Graduates", "sum": "REPLACE ME"},
+            {
+                "label": "Facilities",
+                # Read from the MFTF Facility List sheet, so the count
+                # follows any edits made there.
+                "sheet": "https://docs.google.com/spreadsheets/d/"
+                         "1rtCDNVIW034Dzp9IlNk6irWLwCnmMvhNdgknovEpLno/"
+                         "edit?usp=sharing",
+                # Not a facility - left out of the count entirely.
+                "ignore": ["Other"],
+                "list": True,
+                "link_text": "Our facilities",
+            },
             {"label": "Compositions", "sum": "REPLACE ME"},
             {"label": "Instructional Hours", "sum": "REPLACE ME"},
         ],
@@ -223,6 +241,51 @@ NAME_ALIASES = {"name", "task name"}
 
 class AsanaProblem(Exception):
     """One project couldn't be read, but the rest might still work."""
+
+
+class SheetProblem(Exception):
+    """A Google Sheet couldn't be read; only its own figure is affected."""
+
+
+def sheet_csv_url(link):
+    """Turn a normal Google Sheets link into its plain-text download link."""
+    found = re.search(r"/spreadsheets/d/([A-Za-z0-9_-]+)", link)
+    if not found:
+        return link  # already a direct download link
+    url = (f"https://docs.google.com/spreadsheets/d/{found.group(1)}"
+           "/export?format=csv")
+    tab = re.search(r"[#&?]gid=(\d+)", link)
+    if tab:
+        url += f"&gid={tab.group(1)}"
+    return url
+
+
+def fetch_sheet_names(link):
+    """Every non-blank entry in the first column of a Google Sheet."""
+    request = urllib.request.Request(
+        sheet_csv_url(link), headers={"User-Agent": "pmhu-dashboard"}
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            kind = response.headers.get("Content-Type", "")
+            text = response.read().decode("utf-8-sig", errors="replace")
+    except urllib.error.HTTPError as error:
+        raise SheetProblem(f"HTTP {error.code}")
+    except urllib.error.URLError as error:
+        raise SheetProblem(str(error.reason))
+
+    # A private sheet answers with Google's sign-in page, not the data.
+    if "csv" not in kind and text.lstrip().startswith("<"):
+        raise SheetProblem(
+            "Google sent a sign-in page instead of the sheet. In the sheet, "
+            "click Share and set General access to 'Anyone with the link'."
+        )
+
+    names = []
+    for row in csv.reader(io.StringIO(text)):
+        if row and row[0].strip():
+            names.append(row[0].strip())
+    return names
 
 
 def get_token():
@@ -315,11 +378,16 @@ def flipped(name):
 
 def tidied_values(task, field_name, spec, seen_keys):
     """Read a field, then apply the spec's ignore and merge settings."""
+    return tidied(values_for(task, field_name), spec, seen_keys)
+
+
+def tidied(values, spec, seen_keys):
+    """Apply the spec's flip_names, ignore and merge settings to values."""
     ignore = set(spec.get("ignore") or [])
     merge = spec.get("merge") or {}
 
     out = []
-    for value in values_for(task, field_name):
+    for value in values:
         if spec.get("flip_names"):
             value = flipped(value)
         if value in ignore:
@@ -470,6 +538,25 @@ def build_section(section, tasks, available):
                 "label": spec["label"],
                 "value": tidy_number(spec["fixed"]),
             })
+            continue
+
+        # Neither do Google Sheet lists.
+        if "sheet" in spec:
+            figure = {"label": spec["label"], "value": None}
+            try:
+                seen_keys = set()
+                found = set(tidied(fetch_sheet_names(spec["sheet"]), spec,
+                                   seen_keys))
+                warn_about_unused(spec, seen_keys, spec["label"])
+                figure["value"] = len(found)
+                if spec.get("list"):
+                    figure["items"] = sorted(found, key=lambda s: s.lower())
+                if spec.get("link_text"):
+                    figure["link_text"] = spec["link_text"]
+            except SheetProblem as problem:
+                print(f"  ! {spec['label']}: could not read the sheet - "
+                      f"{problem}")
+            figures.append(figure)
             continue
 
         if not available:
