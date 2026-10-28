@@ -81,6 +81,7 @@ body {
 .sp-pill{font-size:.6rem;font-weight:600;padding:.15rem .48rem;border-radius:3px;display:flex;align-items:center;gap:.28rem;}
 .sp-live{background:var(--live-bg);color:var(--live);border:1px solid #a7e2f2;}
 .sp-dev{background:var(--dev-bg);color:var(--dev);border:1px solid #d1d5db;}
+.sp-progress{background:#fffbeb;color:#a16207;border:1px solid #fcd34d;}
 .sp-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
 
 /* STAT CARDS */
@@ -418,7 +419,9 @@ function drawBoards(sections) {
     pill.appendChild(dot);
 
     if (section.note) {
-      pill.className = "sp-pill sp-dev";
+      pill.className = section.note_color === "yellow"
+        ? "sp-pill sp-progress"
+        : "sp-pill sp-dev";
       pill.appendChild(document.createTextNode(section.note));
     } else {
       pill.className = "sp-pill sp-live";
