@@ -163,6 +163,8 @@ SECTIONS = [
                     # Spelled many ways by hand - all one musician.
                     "Julia Vai": "Julia Varsovie",
                     "Julia Vari": "Julia Varsovie",
+                    # Shown by her full name.
+                    "Bernardo Marcondes": "Bernardo Marcondes Rodrigues",
                 },
             },
         ],
