@@ -195,7 +195,7 @@ SECTIONS = [
                 "link_text": "View enrollment",
             },
             {
-                "label": "Instructors",
+                "label": "Instructors 2026-2027",
                 # The task name is the instructor, written "Last, First".
                 "unique": "Name",
                 "between": {
