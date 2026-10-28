@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-28T14:19:45+00:00",
+  "updated": "2026-10-28T14:33:53+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -132,7 +132,7 @@
           "value": 7074
         },
         {
-          "label": "Enrollment 2026-2027",
+          "label": "Current Enrollment",
           "value": 23,
           "table": {
             "columns": [
@@ -261,7 +261,7 @@
           "link_text": "View enrollment"
         },
         {
-          "label": "Instructors 2026-2027",
+          "label": "Current Instructors",
           "value": 8,
           "items": [
             "Alexandros Darna",
@@ -305,7 +305,7 @@
         },
         {
           "label": "Facilities",
-          "value": 28,
+          "value": 27,
           "items": [
             "Alameda County Santa Rita Jail",
             "Amity Foundation",
@@ -320,7 +320,7 @@
             "Northern Nevada Correctional Center",
             "Pitchess Detention Center",
             "Prototypes HR360",
-            "Rikers",
+            "Rikers Island",
             "Rite of Passage",
             "San Bernardino MAP Program",
             "San Francisco County Jail #2 (CJ2)",
@@ -330,11 +330,10 @@
             "Sonoma County Jail",
             "Sonoma County Juvenile Hall",
             "Sonoma Detention Center",
-            "Southern Desert",
-            "Tahoe Music Alive",
+            "Southern Desert Correctional Center",
             "The Jericho Project",
             "Vista Detention Facility",
-            "West Valley"
+            "West Valley Detention Center"
           ],
           "link_text": "Our facilities"
         },
