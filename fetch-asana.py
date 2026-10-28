@@ -132,6 +132,16 @@ SECTIONS = [
                     "Other - SocialRx": "Art Pharmacy/SocialRx",
                 },
             },
+            {
+                "label": "Musicians",
+                # The task name is the musician. Older entries were typed
+                # in by hand, so some read "Last, First" and some "First
+                # Last" - flipping makes them match so each counts once.
+                "unique": "Name",
+                "list": True,
+                "link_text": "Artist roster",
+                "flip_names": True,
+            },
         ],
         "breakdowns": [
             {
@@ -374,6 +384,7 @@ def values_for(task, field_name):
 
 def flipped(name):
     """'Henderson, Luke' becomes 'Luke Henderson'. Anything else is kept."""
+    name = " ".join(name.split())  # tidy stray or doubled spaces
     parts = name.split(",")
     if len(parts) != 2:
         return name
@@ -495,6 +506,24 @@ def project_ids_for(section):
     return project if isinstance(project, list) else [project]
 
 
+def same_name_any_case(counts):
+    """
+    Treat "matthew aucoin" and "Matthew Aucoin" as one person, shown the
+    way it's most often typed with normal capitals.
+    """
+    groups = {}
+    for name, count in counts.items():
+        groups.setdefault(name.casefold(), []).append((name, count))
+    merged = Counter()
+    for variants in groups.values():
+        best = max(
+            variants,
+            key=lambda v: (v[0] not in (v[0].lower(), v[0].upper()), v[1]),
+        )[0]
+        merged[best] = sum(count for _, count in variants)
+    return merged
+
+
 def build_table(tasks, spec, key_fields):
     """
     One row per value counted, for the popup table.
@@ -577,9 +606,9 @@ def build_section(section, tasks, available):
             if not isinstance(field_names, list):
                 field_names = [field_names]
             seen_keys = set()
-            found = set()
+            found = Counter()
             for field_name in field_names:
-                from_this_field = set()
+                from_this_field = Counter()
                 for task in rows:
                     from_this_field.update(
                         tidied_values(task, field_name, spec, seen_keys)
@@ -590,6 +619,8 @@ def build_section(section, tasks, available):
                           "Asana exactly")
                 found.update(from_this_field)
             warn_about_unused(spec, seen_keys, spec["label"])
+            if spec.get("flip_names"):
+                found = same_name_any_case(found)
             figure["value"] = len(found)
             if spec.get("list"):
                 # Sorted so the popup reads alphabetically, and so the
