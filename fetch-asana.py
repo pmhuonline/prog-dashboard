@@ -7,11 +7,13 @@ You only need to edit the CONFIGURATION section below. Everything under
 """
 
 import csv
+import difflib
 import io
 import json
 import os
 import re
 import sys
+import unicodedata
 import urllib.request
 import urllib.error
 from collections import Counter
@@ -68,6 +70,14 @@ DASHBOARD_TITLE = "Program Metrics"
 #               "flip_names": True turns "Last, First" into "First Last"
 #               for display. It happens first, so write any "ignore" or
 #               "merge" names the way the dashboard shows them.
+#
+#               "match_names": True also folds near-miss spellings of a
+#               name into the version entered as "Last, First" - so
+#               "Nathan Choi" counts under "Choi, Nathanial", and "Elena
+#               Ariza" under "Ariza, Elena Stephanie". It ignores accents,
+#               capitals and middle initials, and accepts short forms and
+#               small typos. A name with extra words (a note in brackets,
+#               a second person) is left alone so it stands out to fix.
 #
 #   "breakdowns"  the bar charts - group tasks by a field, count each value
 #                 "order"   optional, forces the categories into this order
@@ -141,6 +151,19 @@ SECTIONS = [
                 "list": True,
                 "link_text": "Artist roster",
                 "flip_names": True,
+                # Near-miss spellings count under the "Last, First" one.
+                "match_names": True,
+                "ignore": [
+                    # Not a musician - a task holding the starting totals.
+                    "Starting count from Google Sheet",
+                    # A duo - each is listed on their own.
+                    "Emily and Kaitlin Webster-Zuber",
+                ],
+                "merge": {
+                    # Spelled many ways by hand - all one musician.
+                    "Julia Vai": "Julia Varsovie",
+                    "Julia Vari": "Julia Varsovie",
+                },
             },
         ],
         "breakdowns": [
@@ -506,6 +529,101 @@ def project_ids_for(section):
     return project if isinstance(project, list) else [project]
 
 
+def name_key(name):
+    """A name with accents, capitals, dots and extra spaces stripped."""
+    plain = unicodedata.normalize("NFKD", name)
+    plain = "".join(ch for ch in plain if not unicodedata.combining(ch))
+    return " ".join(plain.replace(".", " ").casefold().split())
+
+
+def name_words(name):
+    """The words of a name, leaving out single-letter middle initials."""
+    return [word for word in name_key(name).split() if len(word) > 1]
+
+
+def same_word(a, b):
+    """Equal, a short form (Matt / Matthew), or a small typo."""
+    if a == b:
+        return True
+    short, long_ = sorted((a, b), key=len)
+    if len(short) >= 3 and long_.startswith(short):
+        return True
+    return (len(short) >= 5 and
+            difflib.SequenceMatcher(None, a, b).ratio() >= 0.85)
+
+
+def fits_inside(small, big):
+    """
+    Every word of `small` matches a word of `big`, in order, and the first
+    names match. "Elena Ariza" fits inside "Elena Stephanie Ariza"; "Emily
+    and Kaitlin Webster-Zuber" does not fit inside "Emily Webster-Zuber".
+    """
+    s, b = name_words(small), name_words(big)
+    if not s or not b or not same_word(s[0], b[0]):
+        return False
+    matched = 0
+    for word in b:
+        if matched < len(s) and same_word(s[matched], word):
+            matched += 1
+    return matched == len(s)
+
+
+def match_names(counts, trusted):
+    """
+    Decide which spelling each name counts under. Returns
+    {name as found: name to count it as}.
+    """
+    def rank(name):
+        return (name in trusted,
+                name not in (name.lower(), name.upper()),
+                counts[name],
+                len(name))
+
+    # 1. The same name apart from accents, capitals, dots or spacing.
+    groups = {}
+    for name in counts:
+        groups.setdefault(name_key(name), []).append(name)
+    chosen = {}
+    for variants in groups.values():
+        head = max(variants, key=rank)
+        for variant in variants:
+            chosen[variant] = head
+            if variant in trusted:
+                trusted = trusted | {head}
+
+    def redirect(old, new):
+        for variant, target in chosen.items():
+            if target == old:
+                chosen[variant] = new
+
+    def heads():
+        return sorted(set(chosen.values()), key=rank)
+
+    # 2. A typed-in name that fits inside exactly one trusted name.
+    anchors = [h for h in heads() if h in trusted]
+    for head in heads():
+        if head in trusted:
+            continue
+        fits = [a for a in anchors if fits_inside(head, a)]
+        if len(fits) == 1:
+            redirect(head, fits[0])
+
+    # 3. Two typed-in names with no trusted version that match word for
+    #    word (Nathan Choi / Nathanial Choi). The more-used one wins.
+    for head in heads():
+        if head in trusted or head not in chosen.values():
+            continue
+        words = len(name_words(head))
+        fits = [other for other in heads()
+                if other != head and other not in trusted
+                and len(name_words(other)) == words
+                and fits_inside(head, other)]
+        if len(fits) == 1 and rank(fits[0]) > rank(head):
+            redirect(head, fits[0])
+
+    return chosen
+
+
 def same_name_any_case(counts):
     """
     Treat "matthew aucoin" and "Matthew Aucoin" as one person, shown the
@@ -607,19 +725,42 @@ def build_section(section, tasks, available):
                 field_names = [field_names]
             seen_keys = set()
             found = Counter()
+            # Names entered "Last, First", or named as a merge target,
+            # are the trusted spellings that near-misses fold into.
+            trusted = set()
+            merge_targets = set()
+            for target in (spec.get("merge") or {}).values():
+                merge_targets.update(target if isinstance(target, list)
+                                     else [target])
             for field_name in field_names:
                 from_this_field = Counter()
                 for task in rows:
-                    from_this_field.update(
-                        tidied_values(task, field_name, spec, seen_keys)
-                    )
+                    for raw in values_for(task, field_name):
+                        for value in tidied([raw], spec, seen_keys):
+                            from_this_field[value] += 1
+                            if (" ".join(raw.split()).count(",") == 1
+                                    or value in merge_targets):
+                                trusted.add(value)
                 if not from_this_field:
                     print(f"  ! {spec['label']}: nothing found in "
                           f"'{field_name}' - check the field name matches "
                           "Asana exactly")
                 found.update(from_this_field)
             warn_about_unused(spec, seen_keys, spec["label"])
-            if spec.get("flip_names"):
+            if spec.get("match_names"):
+                chosen = match_names(found, trusted)
+                folded = {v: c for v, c in chosen.items() if v != c}
+                for variant in sorted(folded, key=str.lower):
+                    print(f"  ~ {spec['label']}: counting '{variant}' as "
+                          f"'{folded[variant]}'")
+                merged = Counter()
+                for name, count in found.items():
+                    merged[chosen[name]] += count
+                found = merged
+                # Kept in the data file (not shown on the page) so the
+                # matches can be checked.
+                figure["matched"] = dict(sorted(folded.items()))
+            elif spec.get("flip_names"):
                 found = same_name_any_case(found)
             figure["value"] = len(found)
             if spec.get("list"):
