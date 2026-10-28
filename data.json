@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-28T12:41:52+00:00",
+  "updated": "2026-10-28T12:49:10+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -16,9 +16,9 @@
         },
         {
           "label": "Partner Organizations",
-          "value": 21,
+          "value": 20,
           "items": [
-            "Art Pharmacy",
+            "Art Pharmacy/SocialRx",
             "Cedars-Sinai LA",
             "Columbia University Irving",
             "Dartmouth-Hitchcock",
@@ -26,7 +26,6 @@
             "Huntington Hospital",
             "Monument Health",
             "NYP",
-            "Other - SocialRx",
             "Renaissance Healthcare",
             "Salastina",
             "Scandia Village / Midsummer",
