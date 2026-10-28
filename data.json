@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-28T12:49:10+00:00",
+  "updated": "2026-10-28T13:08:14+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -69,7 +69,132 @@
         },
         {
           "label": "Enrollment 2026-2027",
-          "value": 23
+          "value": 23,
+          "table": {
+            "columns": [
+              "Student",
+              "Location",
+              "Instrument"
+            ],
+            "rows": [
+              [
+                "Albert O",
+                "Kenya",
+                "Piano"
+              ],
+              [
+                "Alex M",
+                "Kenya",
+                "Percussion"
+              ],
+              [
+                "Alvin P",
+                "Kenya",
+                "Viola"
+              ],
+              [
+                "Basil O",
+                "Kenya",
+                "Violin"
+              ],
+              [
+                "Brenda S",
+                "Kenya",
+                "Cello"
+              ],
+              [
+                "Carlos O",
+                "Kenya",
+                "Piano"
+              ],
+              [
+                "Dennis N",
+                "Kenya",
+                "Viola"
+              ],
+              [
+                "Dilan O",
+                "Kenya",
+                "Violin"
+              ],
+              [
+                "Frederick O",
+                "Kenya",
+                "Violin"
+              ],
+              [
+                "Henry N",
+                "Kenya",
+                "Violin"
+              ],
+              [
+                "Javier O",
+                "Kenya",
+                "Piano"
+              ],
+              [
+                "Joseph M",
+                "Kenya",
+                "Oboe"
+              ],
+              [
+                "Joseph N",
+                "Kenya",
+                "Piano"
+              ],
+              [
+                "Kennedy M",
+                "Kenya",
+                "Violin"
+              ],
+              [
+                "Khevy O",
+                "Kenya",
+                "Violin"
+              ],
+              [
+                "Lameck K",
+                "Kenya",
+                "Percussion"
+              ],
+              [
+                "Mercy M",
+                "Kenya",
+                "Viola"
+              ],
+              [
+                "Peter K",
+                "Kenya",
+                "Viola, Violin"
+              ],
+              [
+                "Sophia N",
+                "Kenya",
+                "Violin"
+              ],
+              [
+                "Tevin O",
+                "Kenya",
+                "Viola"
+              ],
+              [
+                "Tracy M",
+                "Kenya",
+                "Cello"
+              ],
+              [
+                "Viela A",
+                "Kenya",
+                "Viola"
+              ],
+              [
+                "Viona F",
+                "Kenya",
+                "Piano"
+              ]
+            ]
+          },
+          "link_text": "View enrollment"
         },
         {
           "label": "Instruments Provided",
