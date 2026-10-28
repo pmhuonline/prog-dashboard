@@ -55,6 +55,10 @@ DASHBOARD_TITLE = "Program Metrics"
 #               "link_text" changes the words at the bottom of a clickable
 #               card, e.g. "View enrollment". Leave it out for "View list".
 #
+#               "flip_names": True turns "Last, First" into "First Last"
+#               for display. "ignore" and "merge" still use the name as
+#               it's written in Asana.
+#
 #   "breakdowns"  the bar charts - group tasks by a field, count each value
 #                 "order"   optional, forces the categories into this order
 #                           and shows them even when the count is zero
@@ -66,7 +70,7 @@ DASHBOARD_TITLE = "Program Metrics"
 #
 # Wherever a field name is asked for you can write "Tags" to use Asana's
 # built-in tags. Tasks can hold several tags at once, so each one counts
-# toward every tag it carries.
+# toward every tag it carries. Write "Name" to use the task's own name.
 #
 # Tidying up messy values - works on figures and breakdowns alike:
 #
@@ -145,8 +149,20 @@ SECTIONS = [
                 "table": ["Student", "Location", "Instrument"],
                 "link_text": "View enrollment",
             },
-            # Maintained by hand - edit the number below and commit.
-            {"label": "Instruments Provided", "fixed": 14},
+            {
+                "label": "Instructors",
+                # The task name is the instructor, written "Last, First".
+                "unique": "Name",
+                "between": {
+                    "field": "Lesson Date",
+                    "from": "2026-09-01",
+                    "to": "2027-06-30",
+                },
+                "list": True,
+                "link_text": "Instructor roster",
+                # Shown as "First Last" on the dashboard.
+                "flip_names": True,
+            },
         ],
         "breakdowns": [
             {
@@ -198,6 +214,7 @@ FIELDS_WE_WANT = ",".join([
 
 DUE_DATE_ALIASES = {"due date", "due on", "due_on"}
 TAG_ALIASES = {"tags", "tag"}
+NAME_ALIASES = {"name", "task name"}
 
 
 class AsanaProblem(Exception):
@@ -275,7 +292,21 @@ def values_for(task, field_name):
     if field_name.strip().lower() in TAG_ALIASES:
         return [t["name"] for t in (task.get("tags") or []) if t.get("name")]
 
+    # So does the task's own name.
+    if field_name.strip().lower() in NAME_ALIASES:
+        name = (task.get("name") or "").strip()
+        return [name] if name else []
+
     return []
+
+
+def flipped(name):
+    """'Henderson, Luke' becomes 'Luke Henderson'. Anything else is kept."""
+    parts = name.split(",")
+    if len(parts) != 2:
+        return name
+    last, first = parts[0].strip(), parts[1].strip()
+    return f"{first} {last}" if first and last else name
 
 
 def tidied_values(task, field_name, spec, seen_keys):
@@ -297,6 +328,8 @@ def tidied_values(task, field_name, spec, seen_keys):
                 out.append(replacement)
         else:
             out.append(value)
+    if spec.get("flip_names"):
+        out = [flipped(value) for value in out]
     return out
 
 
