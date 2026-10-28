@@ -35,7 +35,9 @@ DASHBOARD_TITLE = "Program Metrics"
 #                 "sum"     add up a number field across every task
 #                 "unique"  count how many different values appear in a
 #                           field - use for "how many students", not
-#                           "how many lessons"
+#                           "how many lessons". Give a list of fields,
+#                           e.g. ["Tags", "Hospital/Facility"], to pool
+#                           them - a value found in both counts once.
 #                 "fixed"   a number you type in and maintain by hand.
 #                           Asana is never asked about it.
 #                 (none)    just count the tasks
@@ -89,13 +91,18 @@ SECTIONS = [
             {"label": "Individuals Reached", "sum": "Number in Audience"},
             {
                 "label": "Partner Organizations",
-                "unique": "Tags",
+                # Older reports name the facility in a tag; newer ones use
+                # the Hospital/Facility column. Both are read, and a name
+                # that appears in both is counted once.
+                "unique": ["Tags", "Hospital/Facility"],
                 "list": True,
                 # Not a facility - left out of the count entirely.
                 "ignore": ["Other"],
-                # Counted as one facility, shown by the short name.
                 "merge": {
+                    # Counted as one facility, shown by the short name.
                     "Salastina / Huntington / UCLA": "Salastina",
+                    # Misspelled old tag - counted under the correct name.
+                    "Cedar Sinai LA": "Cedars-Sinai LA",
                 },
             },
         ],
@@ -383,11 +390,23 @@ def build_section(section, tasks, available):
         figure = {"label": spec["label"]}
 
         if "unique" in spec:
+            # One field name or a list of them; values are pooled.
+            field_names = spec["unique"]
+            if not isinstance(field_names, list):
+                field_names = [field_names]
             seen_keys = set()
             found = set()
-            for task in rows:
-                found.update(tidied_values(task, spec["unique"], spec,
-                                           seen_keys))
+            for field_name in field_names:
+                from_this_field = set()
+                for task in rows:
+                    from_this_field.update(
+                        tidied_values(task, field_name, spec, seen_keys)
+                    )
+                if not from_this_field:
+                    print(f"  ! {spec['label']}: nothing found in "
+                          f"'{field_name}' - check the field name matches "
+                          "Asana exactly")
+                found.update(from_this_field)
             warn_about_unused(spec, seen_keys, spec["label"])
             figure["value"] = len(found)
             if spec.get("list"):
