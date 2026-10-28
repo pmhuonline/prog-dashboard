@@ -56,8 +56,8 @@ DASHBOARD_TITLE = "Program Metrics"
 #               card, e.g. "View enrollment". Leave it out for "View list".
 #
 #               "flip_names": True turns "Last, First" into "First Last"
-#               for display. "ignore" and "merge" still use the name as
-#               it's written in Asana.
+#               for display. It happens first, so write any "ignore" or
+#               "merge" names the way the dashboard shows them.
 #
 #   "breakdowns"  the bar charts - group tasks by a field, count each value
 #                 "order"   optional, forces the categories into this order
@@ -162,6 +162,10 @@ SECTIONS = [
                 "link_text": "Instructor roster",
                 # Shown as "First Last" on the dashboard.
                 "flip_names": True,
+                "merge": {
+                    # Same person, entered two ways.
+                    "Sam Budish": "Samuel Budish",
+                },
             },
         ],
         "breakdowns": [
@@ -316,6 +320,8 @@ def tidied_values(task, field_name, spec, seen_keys):
 
     out = []
     for value in values_for(task, field_name):
+        if spec.get("flip_names"):
+            value = flipped(value)
         if value in ignore:
             seen_keys.add(value)
             continue
@@ -328,8 +334,6 @@ def tidied_values(task, field_name, spec, seen_keys):
                 out.append(replacement)
         else:
             out.append(value)
-    if spec.get("flip_names"):
-        out = [flipped(value) for value in out]
     return out
 
 
