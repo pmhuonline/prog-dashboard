@@ -130,6 +130,16 @@ button.stat:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 .modal-list{list-style:none;display:flex;flex-direction:column;gap:.3rem;}
 .modal-list li{font-size:.8rem;line-height:1.6;color:var(--body);padding-left:1rem;position:relative;}
 .modal-list li::before{content:"—";position:absolute;left:0;color:var(--accent);font-size:.68rem;font-weight:bold;}
+.modal-list[hidden],.modal-table[hidden]{display:none;}
+
+/* Popup table, for cards that show several columns per entry */
+.modal.is-wide{max-width:640px;}
+.modal-table{width:100%;border-collapse:collapse;font-size:.8rem;line-height:1.45;}
+.modal-table th{position:sticky;top:-1rem;background:var(--bg3);text-align:left;font-size:.6rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:.5rem .6rem .45rem 0;border-bottom:1px solid var(--border2);}
+.modal-table td{padding:.45rem .6rem .45rem 0;border-bottom:1px solid var(--border);color:var(--body);vertical-align:top;overflow-wrap:anywhere;}
+.modal-table tr:last-child td{border-bottom:none;}
+.modal-table td:first-child{font-weight:500;}
+.modal-table td.is-blank{color:var(--border2);}
 
 /* FOOTER */
 .dfn{padding:.65rem 1.75rem;border-top:1px solid var(--border);background:var(--bg2);font-size:.67rem;color:var(--muted);flex-shrink:0;line-height:1.5;}
@@ -174,7 +184,7 @@ button.stat:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
 <!-- List popup, filled in when a clickable stat card is pressed -->
 <div class="backdrop" id="backdrop" hidden>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-head">
       <div>
         <div class="modal-title" id="modal-title"></div>
@@ -184,6 +194,7 @@ button.stat:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
     </div>
     <div class="modal-body">
       <ul class="modal-list" id="modal-list"></ul>
+      <table class="modal-table" id="modal-table" hidden></table>
     </div>
   </div>
 </div>
@@ -216,19 +227,63 @@ function formatDate(isoString) {
   });
 }
 
+function hasTable(figure) {
+  return !!(figure.table && Array.isArray(figure.table.rows) &&
+            figure.table.rows.length > 0);
+}
+
 function openList(figure) {
   lastFocused = document.activeElement;
+  var useTable = hasTable(figure);
+  var count = useTable ? figure.table.rows.length : figure.items.length;
+
   document.getElementById("modal-title").textContent = figure.label;
   document.getElementById("modal-count").textContent =
-    figure.items.length + (figure.items.length === 1 ? " entry" : " entries");
+    count + (count === 1 ? " entry" : " entries");
 
   var list = document.getElementById("modal-list");
+  var table = document.getElementById("modal-table");
   list.innerHTML = "";
-  figure.items.forEach(function (entry) {
-    var li = document.createElement("li");
-    li.textContent = entry;
-    list.appendChild(li);
-  });
+  table.innerHTML = "";
+  list.hidden = useTable;
+  table.hidden = !useTable;
+  document.getElementById("modal").classList.toggle("is-wide", useTable);
+
+  if (useTable) {
+    var head = document.createElement("thead");
+    var headRow = document.createElement("tr");
+    figure.table.columns.forEach(function (name) {
+      var th = document.createElement("th");
+      th.scope = "col";
+      th.textContent = name;
+      headRow.appendChild(th);
+    });
+    head.appendChild(headRow);
+    table.appendChild(head);
+
+    var body = document.createElement("tbody");
+    figure.table.rows.forEach(function (cells) {
+      var tr = document.createElement("tr");
+      cells.forEach(function (cell) {
+        var td = document.createElement("td");
+        if (cell) {
+          td.textContent = cell;
+        } else {
+          td.textContent = "—";  // em dash for a blank cell
+          td.className = "is-blank";
+        }
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+    table.appendChild(body);
+  } else {
+    figure.items.forEach(function (entry) {
+      var li = document.createElement("li");
+      li.textContent = entry;
+      list.appendChild(li);
+    });
+  }
 
   backdrop.hidden = false;
   document.getElementById("modal-close").focus();
@@ -252,7 +307,8 @@ function makeStats(figures) {
   grid.className = "stats";
 
   figures.forEach(function (figure) {
-    var hasList = Array.isArray(figure.items) && figure.items.length > 0;
+    var hasList = (Array.isArray(figure.items) && figure.items.length > 0) ||
+                  hasTable(figure);
     var card = document.createElement(hasList ? "button" : "div");
     card.className = "stat";
 
@@ -281,7 +337,7 @@ function makeStats(figures) {
     if (hasList) {
       var more = document.createElement("span");
       more.className = "stat-more";
-      more.textContent = "View list →";
+      more.textContent = (figure.link_text || "View list") + " →";
       card.appendChild(more);
     }
 
