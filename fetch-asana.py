@@ -183,7 +183,7 @@ SECTIONS = [
         "figures": [
             {"label": "Lessons", "sum": "Number of Sessions"},
             {
-                "label": "Enrollment 2026-2027",
+                "label": "Current Enrollment",
                 "unique": "Student",
                 "between": {
                     "field": "Lesson Date",
@@ -195,7 +195,7 @@ SECTIONS = [
                 "link_text": "View enrollment",
             },
             {
-                "label": "Instructors 2026-2027",
+                "label": "Current Instructors",
                 # The task name is the instructor, written "Last, First".
                 "unique": "Name",
                 "between": {
