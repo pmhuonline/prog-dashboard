@@ -1,10 +1,11 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-28T13:48:22+00:00",
+  "updated": "2026-10-28T13:50:41+00:00",
   "sections": [
     {
       "name": "VSI Reports",
       "note": null,
+      "note_color": null,
       "figures": [
         {
           "label": "Performances",
@@ -62,6 +63,7 @@
     {
       "name": "NV Reports",
       "note": null,
+      "note_color": null,
       "figures": [
         {
           "label": "Lessons",
@@ -232,7 +234,8 @@
     },
     {
       "name": "MFTF Metrics",
-      "note": "No connection",
+      "note": "In progress",
+      "note_color": "yellow",
       "figures": [
         {
           "label": "Students",
