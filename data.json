@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-28T13:24:06+00:00",
+  "updated": "2026-10-28T13:30:36+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -198,7 +198,7 @@
         },
         {
           "label": "Instructors",
-          "value": 9,
+          "value": 8,
           "items": [
             "Alexandros Darna",
             "Donald Speer",
@@ -207,7 +207,6 @@
             "Lindsay Flowers Koh",
             "Luke Henderson",
             "Peter Dudek",
-            "Sam Budish",
             "Samuel Budish"
           ],
           "link_text": "Instructor roster"
