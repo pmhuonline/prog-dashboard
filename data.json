@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-10-31T13:59:47+00:00",
+  "updated": "2026-10-31T18:17:28+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -9,16 +9,17 @@
       "figures": [
         {
           "label": "Performances",
-          "value": 4137
+          "value": 4138
         },
         {
           "label": "Individuals Reached",
-          "value": 25750
+          "value": 25751
         },
         {
           "label": "Partner Organizations",
-          "value": 20,
+          "value": 22,
           "items": [
+            "ALS",
             "Art Pharmacy/SocialRx",
             "Cedars-Sinai LA",
             "Columbia University Irving",
@@ -27,6 +28,7 @@
             "Huntington Hospital",
             "Monument Health",
             "NYP",
+            "Other - Art Pharmacy",
             "Renaissance Healthcare",
             "Salastina",
             "Scandia Village / Midsummer",
@@ -115,7 +117,7 @@
             },
             {
               "name": "No",
-              "value": 649,
+              "value": 650,
               "color": "live"
             }
           ]
