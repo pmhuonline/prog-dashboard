@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-11-02T03:15:56+00:00",
+  "updated": "2026-11-02T11:47:42+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -131,11 +131,11 @@
       "figures": [
         {
           "label": "Lessons",
-          "value": 7074
+          "value": 7091
         },
         {
           "label": "Current Enrollment",
-          "value": 23,
+          "value": 24,
           "table": {
             "columns": [
               "Student",
@@ -157,6 +157,11 @@
                 "Alvin P",
                 "Kenya",
                 "Viola"
+              ],
+              [
+                "Aref D",
+                "Palestine",
+                "Violin"
               ],
               [
                 "Basil O",
@@ -284,12 +289,12 @@
           "items": [
             {
               "name": "Yes",
-              "value": 59,
+              "value": 61,
               "color": "accent"
             },
             {
               "name": "No",
-              "value": 608,
+              "value": 623,
               "color": "live"
             }
           ]
