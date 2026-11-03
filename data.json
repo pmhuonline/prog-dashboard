@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-11-03T10:15:45+00:00",
+  "updated": "2026-11-03T17:02:41+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -9,18 +9,16 @@
       "figures": [
         {
           "label": "Performances",
-          "value": 4139
+          "value": 4140
         },
         {
           "label": "Individuals Reached",
-          "value": 25754
+          "value": 25759
         },
         {
           "label": "Partner Organizations",
-          "value": 22,
+          "value": 21,
           "items": [
-            "ALS",
-            "Art Pharmacy/SocialRx",
             "Cedars-Sinai LA",
             "Columbia University Irving",
             "Dartmouth-Hitchcock",
@@ -28,13 +26,14 @@
             "Huntington Hospital",
             "Monument Health",
             "NYP",
-            "Other - Art Pharmacy",
             "Renaissance Healthcare",
             "Salastina",
             "Scandia Village / Midsummer",
             "Scripps Encinitas",
             "Sharp Memorial",
+            "SocialRx / Art Pharmacy",
             "Strong Memorial / EPAM",
+            "The ALS Association",
             "Thomas Jefferson University",
             "UCLA",
             "VA Eastern Colorado",
@@ -117,7 +116,7 @@
             },
             {
               "name": "No",
-              "value": 651,
+              "value": 652,
               "color": "live"
             }
           ]
