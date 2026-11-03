@@ -138,8 +138,8 @@ SECTIONS = [
                     # Misspelled old tag - counted under the correct name.
                     "Cedar Sinai LA": "Cedars-Sinai LA",
                     # Art Pharmacy renamed itself SocialRx - one partner.
-                    "Art Pharmacy": "Art Pharmacy/SocialRx",
-                    "Other - SocialRx": "Art Pharmacy/SocialRx",
+                    "Art Pharmacy": "SocialRx / Art Pharmacy",
+                    "Other - SocialRx": "Social Rx / Art Pharmacy",
                 },
             },
             {
