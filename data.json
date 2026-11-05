@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-11-05T07:31:11+00:00",
+  "updated": "2026-11-05T15:54:26+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -17,7 +17,7 @@
         },
         {
           "label": "Partner Organizations",
-          "value": 21,
+          "value": 22,
           "items": [
             "Cedars-Sinai LA",
             "Columbia University Irving",
@@ -31,6 +31,7 @@
             "Scandia Village / Midsummer",
             "Scripps Encinitas",
             "Sharp Memorial",
+            "Social Rx / Art Pharmacy",
             "SocialRx / Art Pharmacy",
             "Strong Memorial / EPAM",
             "The ALS Association",
