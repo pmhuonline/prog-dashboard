@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-11-12T13:25:56+00:00",
+  "updated": "2026-11-12T21:13:38+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -131,7 +131,7 @@
       "figures": [
         {
           "label": "Lessons",
-          "value": 7104
+          "value": 7114
         },
         {
           "label": "Current Enrollment",
@@ -185,7 +185,7 @@
               ],
               [
                 "Dilan O",
-                "Kenya",
+                "Kenya, Palestine",
                 "Violin"
               ],
               [
@@ -299,12 +299,12 @@
           "items": [
             {
               "name": "Yes",
-              "value": 62,
+              "value": 63,
               "color": "accent"
             },
             {
               "name": "No",
-              "value": 635,
+              "value": 644,
               "color": "live"
             }
           ]
