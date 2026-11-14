@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-11-13T18:16:05+00:00",
+  "updated": "2026-11-14T00:01:28+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -9,11 +9,11 @@
       "figures": [
         {
           "label": "Performances",
-          "value": 4150
+          "value": 4152
         },
         {
           "label": "Individuals Reached",
-          "value": 25800
+          "value": 25806
         },
         {
           "label": "Partner Organizations",
@@ -117,7 +117,7 @@
             },
             {
               "name": "No",
-              "value": 662,
+              "value": 664,
               "color": "live"
             }
           ]
