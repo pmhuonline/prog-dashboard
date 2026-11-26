@@ -1,6 +1,6 @@
 {
   "title": "Program Metrics",
-  "updated": "2026-11-26T05:52:19+00:00",
+  "updated": "2026-11-26T15:58:40+00:00",
   "sections": [
     {
       "name": "VSI Reports",
@@ -131,7 +131,7 @@
       "figures": [
         {
           "label": "Lessons",
-          "value": 7129
+          "value": 7143
         },
         {
           "label": "Current Enrollment",
@@ -289,13 +289,14 @@
         },
         {
           "label": "Current Instructors",
-          "value": 9,
+          "value": 10,
           "items": [
             "Alexandros Darna",
             "Donald Speer",
             "Ian Maloney",
             "James Preucil",
             "Lindsay Flowers Koh",
+            "Lindsay Koh",
             "Luke Henderson",
             "Nicole Lam",
             "Peter Dudek",
@@ -310,12 +311,12 @@
           "items": [
             {
               "name": "Yes",
-              "value": 69,
+              "value": 70,
               "color": "accent"
             },
             {
               "name": "No",
-              "value": 653,
+              "value": 666,
               "color": "live"
             }
           ]
